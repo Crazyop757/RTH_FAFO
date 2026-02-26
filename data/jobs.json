@@ -1,0 +1,24 @@
+[
+  {
+    "id": "252361a6-d775-4ee3-842d-80f3469985db",
+    "title": "ML Engineer",
+    "company": "AIRAC",
+    "description": "heheh me nahi lunga tereko",
+    "required_skills": [
+      "python"
+    ],
+    "created_by": "Hehe_recruit",
+    "created_at": "2026-02-26T19:56:27.407981+00:00"
+  },
+  {
+    "id": "74330c9d-6ee3-4ce5-957f-c3ac70ee4f85",
+    "title": "Machine Learning Engineer",
+    "company": "AIRAC",
+    "description": "sde dedw",
+    "required_skills": [
+      "python"
+    ],
+    "created_by": "Rudra",
+    "created_at": "2026-02-26T20:00:39.983602+00:00"
+  }
+]

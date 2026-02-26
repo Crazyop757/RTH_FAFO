@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlacementIQ – Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-100 shadow-sm">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <a href="/home" class="flex items-center gap-2 font-semibold text-gray-900">
+        <span class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">P</span>
+        PlacementIQ
+      </a>
+    </div>
+  </nav>
+
+  <!-- Card -->
+  <div class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+
+      <!-- Heading -->
+      <div class="text-center mb-8">
+        <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-xl mx-auto mb-4">P</div>
+        <h1 class="text-2xl font-semibold text-gray-800">Welcome back</h1>
+        <p class="text-gray-500 text-sm mt-1">Enter any username and select your role to continue.</p>
+      </div>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="space-y-2 mb-5">
+        {% for category, message in messages %}
+        <div class="rounded-lg px-4 py-3 text-sm
+          {% if category == 'error' %}bg-red-50 border border-red-200 text-red-700
+          {% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      <!-- Form card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <form method="POST" action="/login" class="space-y-5">
+
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+            <input
+              id="username" name="username" type="text" required
+              placeholder="Enter any username"
+              class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm
+                     text-gray-800 placeholder-gray-400 focus:outline-none
+                     focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                     transition" />
+          </div>
+
+          <div>
+            <label for="role" class="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+            <select
+              id="role" name="role" required
+              class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm
+                     text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500
+                     focus:border-transparent transition bg-white">
+              <option value="">Select your role…</option>
+              <option value="student">Student</option>
+              <option value="recruiter">Recruiter</option>
+            </select>
+            <p id="role-hint" class="text-xs text-gray-400 mt-1.5 hidden"></p>
+          </div>
+
+          <button type="submit"
+                  class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold
+                         text-sm hover:bg-indigo-700 transition-colors mt-1">
+            Continue &rarr;
+          </button>
+
+        </form>
+      </div>
+
+      <p class="text-center text-xs text-gray-400 mt-6">
+        No account needed — just pick a username and role.
+        <a href="/home" class="text-indigo-600 hover:underline ml-1">Back to home</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-100 py-4">
+    <p class="text-center text-gray-400 text-xs">PlacementIQ &middot; AI Placement Platform</p>
+  </footer>
+
+  <script>
+    const hints = {
+      student:   'You’ll land on the resume analysis page.',
+      recruiter: 'You’ll land on the recruiter job dashboard.',
+    };
+    document.getElementById('role').addEventListener('change', function () {
+      const hint = document.getElementById('role-hint');
+      if (hints[this.value]) {
+        hint.textContent = hints[this.value];
+        hint.classList.remove('hidden');
+      } else {
+        hint.classList.add('hidden');
+      }
+    });
+  </script>
+
+</body>
+</html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlacementIQ – Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0f1117; }
+  </style>
+</head>
+<body class="text-slate-200 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#12141f] border-b border-[#2c3050]">
+    <div class="max-w-6xl mx-auto flex items-center px-5 py-3 gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6c63ff] to-[#00d4aa]
+                  flex items-center justify-center text-lg select-none">&#127919;</div>
+      <span class="font-semibold text-lg tracking-tight">PlacementIQ</span>
+    </div>
+  </header>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="max-w-sm mx-auto w-full px-4 mt-6 space-y-2">
+    {% for category, message in messages %}
+    <div class="rounded-xl px-4 py-3 text-sm
+                {{ 'bg-red-500/15 border border-red-500/30 text-red-300' if category == 'error'
+                   else 'bg-blue-500/15 border border-blue-500/30 text-blue-300' }}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Card -->
+  <main class="flex-1 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-sm">
+
+      <!-- Logo area -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#6c63ff] to-[#00d4aa]
+                    flex items-center justify-center text-3xl mx-auto mb-4">&#127919;</div>
+        <h1 class="text-2xl font-bold tracking-tight">Welcome back</h1>
+        <p class="text-slate-400 text-sm mt-1">Sign in to PlacementIQ</p>
+      </div>
+
+      <!-- Form -->
+      <form method="POST" action="/login" class="space-y-5">
+
+        <!-- Username -->
+        <div>
+          <label for="username"
+                 class="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2">
+            Username
+          </label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            required
+            placeholder="Enter your username"
+            class="w-full rounded-xl bg-[#1e2235] border border-[#2c3050] px-4 py-3 text-sm
+                   text-slate-200 placeholder-slate-600
+                   focus:outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff]
+                   transition-colors"
+          />
+        </div>
+
+        <!-- Role -->
+        <div>
+          <label for="role"
+                 class="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-2">
+            Role
+          </label>
+          <div class="relative">
+            <select
+              id="role"
+              name="role"
+              required
+              class="w-full rounded-xl bg-[#1e2235] border border-[#2c3050] px-4 py-3 text-sm
+                     text-slate-200 appearance-none
+                     focus:outline-none focus:border-[#6c63ff] focus:ring-1 focus:ring-[#6c63ff]
+                     transition-colors cursor-pointer"
+            >
+              <option value="" disabled selected class="text-slate-600">Select your role…</option>
+              <option value="student">&#127891; Student</option>
+              <option value="recruiter">&#128188; Recruiter</option>
+            </select>
+            <!-- Custom chevron -->
+            <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+                   d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role description hints -->
+        <div id="role-hint" class="hidden rounded-xl p-3 text-xs border">
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="w-full rounded-xl bg-gradient-to-r from-[#6c63ff] to-[#5a52e0]
+                 hover:from-[#7b72ff] hover:to-[#6c63ff]
+                 text-white font-semibold py-3 text-sm
+                 transition-all duration-150 active:scale-[.98]">
+          Sign In &rarr;
+        </button>
+
+      </form>
+
+      <!-- Info -->
+      <p class="text-center text-slate-600 text-xs mt-8">
+        No account needed &mdash; just enter any username and pick your role.
+      </p>
+
+    </div>
+  </main>
+
+  <script>
+    const select = document.getElementById('role');
+    const hint   = document.getElementById('role-hint');
+
+    const hints = {
+      student: {
+        text: '&#127891; You will be taken to the resume analysis tool.',
+        cls:  'bg-[#6c63ff]/10 border-[#6c63ff]/30 text-[#a09af7]',
+      },
+      recruiter: {
+        text: '&#128188; You will be taken to the recruiter job dashboard.',
+        cls:  'bg-[#00d4aa]/10 border-[#00d4aa]/30 text-[#00d4aa]',
+      },
+    };
+
+    select.addEventListener('change', function () {
+      const h = hints[this.value];
+      if (h) {
+        hint.innerHTML = h.text;
+        hint.className = 'rounded-xl p-3 text-xs border ' + h.cls;
+        hint.classList.remove('hidden');
+      } else {
+        hint.classList.add('hidden');
+      }
+    });
+  </script>
+
+</body>
+</html>

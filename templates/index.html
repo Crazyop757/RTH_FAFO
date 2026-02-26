@@ -3,291 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlacementIQ – AI Placement Analyser</title>
+  <title>PlacementIQ &ndash; Resume Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --bg:      #0f1117;
-      --surface: #1a1d2e;
-      --card:    #1e2235;
-      --border:  #2c3050;
-      --accent:  #6c63ff;
-      --accent2: #00d4aa;
-      --text:    #e8eaf6;
-      --sub:     #9fa8da;
-      --danger:  #ff6b6b;
-      --success: #69f0ae;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-    }
-    /* ── Header ── */
-    header {
-      background: linear-gradient(135deg, #1a1d2e 0%, #12141f 100%);
-      border-bottom: 1px solid var(--border);
-      padding: 1.5rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    header .logo {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
-    }
-    header h1 { font-size: 1.5rem; font-weight: 700; }
-    header span { font-size: 0.8rem; color: var(--sub); margin-left: 6px; }
-
-    /* ── Layout ── */
-    main {
-      max-width: 720px;
-      margin: 3rem auto;
-      padding: 0 1.5rem;
-    }
-    .hero {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    .hero h2 {
-      font-size: 2rem;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: .5rem;
-    }
-    .hero p { color: var(--sub); font-size: 1rem; }
-
-    /* ── Card ── */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-    }
-    .section-title {
-      font-size: .75rem;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent2);
-      margin-bottom: .75rem;
-    }
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 1.5rem 0;
-    }
-
-    /* ── Form ── */
-    form { display: flex; flex-direction: column; gap: 1.25rem; }
-    label { font-size: .85rem; color: var(--sub); margin-bottom: .3rem; display: block; }
-    input[type="text"], input[type="number"], select {
-      width: 100%;
-      background: #12141f;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: .6rem .9rem;
-      font-size: .95rem;
-      outline: none;
-      transition: border-color .2s;
-    }
-    input:focus, select:focus { border-color: var(--accent); }
-    select option { background: #1a1d2e; }
-
-    /* upload area */
-    .file-drop {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 2rem 1rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-      position: relative;
-    }
-    .file-drop:hover, .file-drop.drag { border-color: var(--accent); background: rgba(108,99,255,.05); }
-    .file-drop input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .file-icon { font-size: 2.5rem; margin-bottom: .5rem; }
-    .file-drop p { color: var(--sub); font-size: .9rem; }
-    .file-drop strong { color: var(--accent); }
-    #file-name { margin-top: .5rem; font-size: .8rem; color: var(--accent2); }
-
-    /* row grid */
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-    /* submit */
-    button[type="submit"] {
-      background: linear-gradient(135deg, var(--accent), #9b59b6);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: .85rem;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
-      margin-top: .5rem;
-    }
-    button[type="submit"]:hover { opacity: .9; transform: translateY(-1px); }
-    button[type="submit"]:active { transform: translateY(0); }
-
-    /* badges */
-    .badge-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
-    .badge {
-      background: rgba(108,99,255,.15);
-      border: 1px solid rgba(108,99,255,.3);
-      border-radius: 20px;
-      padding: .25rem .65rem;
-      font-size: .75rem;
-      color: var(--sub);
-    }
-
-    /* Flash messages */
-    .flash { border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1rem; font-size: .9rem; }
-    .flash.error   { background: rgba(255,107,107,.15); border: 1px solid rgba(255,107,107,.4); color: var(--danger); }
-    .flash.success { background: rgba(105,240,174,.12); border: 1px solid rgba(105,240,174,.3);  color: var(--success); }
-
-    /* loader */
-    .loader { display: none; text-align: center; color: var(--sub); font-size: .9rem; margin-top: .5rem; }
-    .spinner {
-      width: 28px; height: 28px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      display: inline-block;
-      margin-bottom: .4rem;
-    }
+    .file-drop-active { border-color: #6366f1 !important; background-color: #eef2ff; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    footer {
-      text-align: center;
-      color: var(--sub);
-      font-size: .78rem;
-      margin: 3rem 0 2rem;
-    }
+    .spin { animation: spin .7s linear infinite; }
   </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
 
-<header>
-  <div class="logo">🎯</div>
-  <div>
-    <h1>PlacementIQ<span>AI-Powered Placement Analysis</span></h1>
-  </div>
-</header>
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <a href="/home" class="flex items-center gap-2 font-semibold text-gray-900">
+        <span class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">P</span>
+        PlacementIQ
+      </a>
+      <div class="flex items-center gap-5 text-sm">
+        <a href="/jobs" class="text-gray-500 hover:text-indigo-600 transition-colors font-medium">Browse Jobs</a>
+        <a href="/" class="text-indigo-600 font-semibold">Analysis</a>
+        {% if session.user %}
+        <span class="text-gray-400">{{ session.user }}</span>
+        {% endif %}
+        <a href="/logout" class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Logout</a>
+      </div>
+    </div>
+  </nav>
 
-<main>
-  <div class="hero">
-    <h2>Know Your Placement Readiness</h2>
-    <p>Upload your resume, link your profiles, and get an AI-driven skill report with a personalised roadmap.</p>
-  </div>
-
+  <!-- Flash messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="max-w-3xl mx-auto w-full px-6 mt-5 space-y-2">
     {% for category, message in messages %}
-      <div class="flash {{ category }}">{{ message }}</div>
+    <div class="rounded-lg px-4 py-3 text-sm
+      {% if category == 'error' %}bg-red-50 border border-red-200 text-red-700
+      {% elif category == 'success' %}bg-green-50 border border-green-200 text-green-700
+      {% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %}">
+      {{ message }}
+    </div>
     {% endfor %}
+  </div>
+  {% endif %}
   {% endwith %}
 
-  <div class="card">
+  <main class="max-w-3xl mx-auto w-full px-6 py-10 flex-1">
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-semibold text-gray-800">Resume Analysis</h1>
+      <p class="text-gray-500 text-sm mt-1">Upload your resume and link your profiles for an AI-powered placement report.</p>
+    </div>
+
+    {% if has_profile %}
+    <div class="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3 text-sm text-indigo-700 mb-6 flex items-center justify-between">
+      <span>&#10003; You have a profile from your last analysis.</span>
+      <a href="/jobs" class="font-semibold underline hover:no-underline">Browse Jobs &rarr;</a>
+    </div>
+    {% endif %}
+
     <form method="POST" action="/analyse" enctype="multipart/form-data" id="analyseForm">
+      <div class="space-y-6">
 
-      <!-- Resume Upload -->
-      <div>
-        <p class="section-title">📄 Resume</p>
-        <div class="file-drop" id="fileDrop">
-          <input type="file" name="resume" id="resumeFile" accept=".pdf,.docx,.doc,.txt" required />
-          <div class="file-icon">📎</div>
-          <p><strong>Click to upload</strong> or drag &amp; drop</p>
-          <p>PDF, DOCX, or TXT · Max 5 MB</p>
-          <div id="file-name"></div>
+        <!-- Resume Upload -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 class="font-semibold text-gray-700 text-sm mb-4">Resume</h2>
+          <label for="resumeFile" id="fileDrop"
+                 class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200
+                        rounded-xl px-6 py-10 cursor-pointer hover:border-indigo-400 transition-colors">
+            <span class="text-3xl mb-3">&#128206;</span>
+            <span class="font-medium text-gray-700 text-sm">Click to upload or drag &amp; drop</span>
+            <span class="text-gray-400 text-xs mt-1">PDF, DOCX, or TXT &middot; Max 5 MB</span>
+            <span id="file-name" class="text-indigo-600 text-sm font-medium mt-2"></span>
+            <input type="file" name="resume" id="resumeFile" accept=".pdf,.docx,.doc,.txt" required class="hidden" />
+          </label>
         </div>
-      </div>
 
-      <hr class="divider" />
-
-      <!-- External Profiles -->
-      <p class="section-title">🔗 External Profiles</p>
-      <div class="row">
-        <div>
-          <label for="github">GitHub Username</label>
-          <input type="text" id="github" name="github_username" placeholder="e.g. torvalds" />
+        <!-- External Profiles -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 class="font-semibold text-gray-700 text-sm mb-4">External Profiles <span class="text-gray-400 font-normal">(optional)</span></h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="github" class="block text-xs font-medium text-gray-600 mb-1.5">GitHub Username</label>
+              <input type="text" id="github" name="github_username" placeholder="e.g. torvalds"
+                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
+            </div>
+            <div>
+              <label for="leetcode" class="block text-xs font-medium text-gray-600 mb-1.5">LeetCode Username</label>
+              <input type="text" id="leetcode" name="leetcode_username" placeholder="e.g. neal_wu"
+                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
+            </div>
+          </div>
         </div>
-        <div>
-          <label for="leetcode">LeetCode Username</label>
-          <input type="text" id="leetcode" name="leetcode_username" placeholder="e.g. neal_wu" />
+
+        <!-- Academic & Role -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 class="font-semibold text-gray-700 text-sm mb-4">Academic &amp; Target Role <span class="text-gray-400 font-normal">(optional)</span></h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="cgpa" class="block text-xs font-medium text-gray-600 mb-1.5">CGPA (out of 10)</label>
+              <input type="number" id="cgpa" name="cgpa" placeholder="e.g. 8.5" min="0" max="10" step="0.01"
+                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm placeholder-gray-400
+                            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" />
+            </div>
+            <div>
+              <label for="target_role" class="block text-xs font-medium text-gray-600 mb-1.5">Target Role</label>
+              <select id="target_role" name="target_role"
+                      class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 bg-white
+                             focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                <option value="">&#8212; Best match automatically &#8212;</option>
+                {% for role in available_roles %}
+                <option value="{{ role }}">{{ role }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <hr class="divider" />
-
-      <!-- Academic + Role -->
-      <p class="section-title">🎓 Academic &amp; Target Role</p>
-      <div class="row">
-        <div>
-          <label for="cgpa">CGPA (out of 10)</label>
-          <input type="number" id="cgpa" name="cgpa"
-                 placeholder="e.g. 8.5" min="0" max="10" step="0.01" />
+        <!-- Submit -->
+        <div class="flex items-center gap-4">
+          <button type="submit" id="submitBtn"
+                  class="bg-indigo-600 text-white px-8 py-2.5 rounded-lg font-semibold text-sm
+                         hover:bg-indigo-700 transition-colors flex items-center gap-2">
+            <span id="btnLabel">Analyse Profile &rarr;</span>
+            <span id="btnSpinner" class="hidden w-4 h-4 border-2 border-white/40 border-t-white rounded-full spin"></span>
+          </button>
+          <span class="text-gray-400 text-xs hidden" id="loadingText">Fetching data&hellip;</span>
         </div>
-        <div>
-          <label for="target_role">Target Role <em style="font-weight:400">(optional)</em></label>
-          <select id="target_role" name="target_role">
-            <option value="">— Best match automatically —</option>
-            {% for role in available_roles %}
-              <option value="{{ role }}">{{ role }}</option>
-            {% endfor %}
-          </select>
+
+        <!-- Badges -->
+        <div class="flex flex-wrap gap-2 pt-1">
+          {% for badge in ['Skill Authenticity Score','Role Match','Skill Gap Analysis','Personalised Roadmap','Readiness Grade'] %}
+          <span class="bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-md text-xs font-medium">{{ badge }}</span>
+          {% endfor %}
         </div>
-      </div>
 
-      <hr class="divider" />
-
-      <button type="submit" id="submitBtn">🚀 Analyse My Profile</button>
-      <div class="loader" id="loader">
-        <div class="spinner"></div><br/>Fetching GitHub &amp; LeetCode data · extracting skills · computing score…
       </div>
     </form>
+  </main>
 
-    <div class="badge-row" style="margin-top:1.5rem">
-      <span class="badge">📊 Skill Authenticity Score</span>
-      <span class="badge">🏆 Role Match Ranking</span>
-      <span class="badge">🔍 Skill Gap Analysis</span>
-      <span class="badge">🗺️ Personalised Roadmap</span>
-      <span class="badge">📈 Readiness Grade</span>
-    </div>
-  </div>
-</main>
+  <footer class="bg-white border-t border-gray-100 py-5 mt-8">
+    <p class="text-center text-gray-400 text-xs">PlacementIQ &middot; AI Placement Platform</p>
+  </footer>
 
-<footer>PlacementIQ · Built with Python Flask · All data processed server-side</footer>
-
-<script>
-  // Show selected filename
-  document.getElementById('resumeFile').addEventListener('change', function () {
-    const name = this.files[0] ? this.files[0].name : '';
-    document.getElementById('file-name').textContent = name ? '✅ ' + name : '';
-  });
-
-  // Drag-over styling
-  const drop = document.getElementById('fileDrop');
-  ['dragover','dragenter'].forEach(evt =>
-    drop.addEventListener(evt, e => { e.preventDefault(); drop.classList.add('drag'); })
-  );
-  ['dragleave','drop'].forEach(evt =>
-    drop.addEventListener(evt, () => drop.classList.remove('drag'))
-  );
-
-  // Show loader on submit
-  document.getElementById('analyseForm').addEventListener('submit', function () {
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('loader').style.display = 'block';
-  });
-</script>
+  <script>
+    document.getElementById('resumeFile').addEventListener('change', function () {
+      document.getElementById('file-name').textContent = this.files[0] ? '\u2713 ' + this.files[0].name : '';
+    });
+    var drop = document.getElementById('fileDrop');
+    ['dragover','dragenter'].forEach(function(e) {
+      drop.addEventListener(e, function(ev) { ev.preventDefault(); drop.classList.add('file-drop-active'); });
+    });
+    ['dragleave','drop'].forEach(function(e) {
+      drop.addEventListener(e, function() { drop.classList.remove('file-drop-active'); });
+    });
+    document.getElementById('analyseForm').addEventListener('submit', function () {
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('btnLabel').textContent = 'Analysing\u2026';
+      document.getElementById('btnSpinner').classList.remove('hidden');
+      document.getElementById('loadingText').classList.remove('hidden');
+    });
+  </script>
 </body>
 </html>

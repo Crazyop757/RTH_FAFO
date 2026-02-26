@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlacementIQ – AI-Driven Placement Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <a href="/home" class="flex items-center gap-2 font-semibold text-gray-900 text-lg">
+        <span class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">P</span>
+        PlacementIQ
+      </a>
+      <a href="/login"
+         class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+        Login
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
+    <span class="inline-block bg-indigo-50 text-indigo-600 text-xs font-semibold px-3 py-1 rounded-full mb-6 tracking-wide uppercase">
+      AI-Powered Platform
+    </span>
+    <h1 class="text-5xl font-bold text-gray-900 leading-tight mb-6">
+      AI-Driven Placement<br/>Intelligence
+    </h1>
+    <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-10">
+      Analyze skills, verify experience, and connect talent with recruiters —
+      powered by real-time GitHub, LeetCode, and resume analysis.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="/login"
+         class="bg-indigo-600 text-white px-7 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors text-base">
+        Student Login
+      </a>
+      <a href="/login"
+         class="bg-white border border-gray-200 text-gray-700 px-7 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-base shadow-sm">
+        Recruiter Login
+      </a>
+    </div>
+
+    <!-- Social proof row -->
+    <div class="mt-14 flex flex-wrap justify-center gap-8 text-sm text-gray-400">
+      <span class="flex items-center gap-1.5"><span class="text-indigo-400">✓</span> Resume parsing</span>
+      <span class="flex items-center gap-1.5"><span class="text-indigo-400">✓</span> GitHub verification</span>
+      <span class="flex items-center gap-1.5"><span class="text-indigo-400">✓</span> LeetCode stats</span>
+      <span class="flex items-center gap-1.5"><span class="text-indigo-400">✓</span> Skill gap analysis</span>
+      <span class="flex items-center gap-1.5"><span class="text-indigo-400">✓</span> Recruiter matching</span>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="bg-white border-y border-gray-100 py-20">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-center text-2xl font-semibold text-gray-800 mb-2">Everything you need</h2>
+      <p class="text-center text-gray-400 text-sm mb-12">Built for final-year students and campus recruiters.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="bg-gray-50 rounded-2xl border border-gray-100 p-7">
+          <div class="w-11 h-11 bg-indigo-50 rounded-xl flex items-center justify-center text-2xl mb-4">📄</div>
+          <h3 class="font-semibold text-gray-800 text-base mb-2">Resume + GitHub AI Analysis</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Automatically extract skills from your resume and cross-reference them with your GitHub repositories for verified experience.
+          </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-2xl border border-gray-100 p-7">
+          <div class="w-11 h-11 bg-indigo-50 rounded-xl flex items-center justify-center text-2xl mb-4">🏆</div>
+          <h3 class="font-semibold text-gray-800 text-base mb-2">Skill Authenticity &amp; Readiness</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Get an authenticity score, role-match percentage, and overall readiness grade — with a personalised learning roadmap.
+          </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-2xl border border-gray-100 p-7">
+          <div class="w-11 h-11 bg-indigo-50 rounded-xl flex items-center justify-center text-2xl mb-4">🤝</div>
+          <h3 class="font-semibold text-gray-800 text-base mb-2">Recruiter Talent Matching</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Recruiters post jobs with required skills. The platform automatically ranks applicants by AI-computed readiness and match scores.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="max-w-4xl mx-auto px-6 py-20">
+    <h2 class="text-center text-2xl font-semibold text-gray-800 mb-2">How it works</h2>
+    <p class="text-center text-gray-400 text-sm mb-14">Three steps from upload to placement.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <div class="text-center">
+        <div class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 font-bold">1</div>
+        <h3 class="font-semibold text-gray-800 mb-2">Upload Profile</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Upload your resume and enter GitHub / LeetCode usernames.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 font-bold">2</div>
+        <h3 class="font-semibold text-gray-800 mb-2">AI Analysis</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Our pipeline extracts, verifies, and scores your skills in real time.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 font-bold">3</div>
+        <h3 class="font-semibold text-gray-800 mb-2">Apply &amp; Hire</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Browse open roles, apply instantly, and let recruiters find top talent.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-indigo-600 py-14">
+    <div class="max-w-2xl mx-auto px-6 text-center">
+      <h2 class="text-2xl font-bold text-white mb-3">Ready to get started?</h2>
+      <p class="text-indigo-200 text-sm mb-7">Join hundreds of students and recruiters already on the platform.</p>
+      <a href="/login"
+         class="inline-block bg-white text-indigo-600 font-semibold px-8 py-3 rounded-lg hover:bg-indigo-50 transition-colors">
+        Get Started Free
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-100 py-8">
+    <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span class="flex items-center gap-2 font-semibold text-gray-600 text-sm">
+        <span class="w-5 h-5 bg-indigo-600 rounded flex items-center justify-center text-white text-xs">P</span>
+        PlacementIQ
+      </span>
+      <p class="text-gray-400 text-xs">Built with Python Flask &middot; AI placement analysis</p>
+    </div>
+  </footer>
+
+</body>
+</html>

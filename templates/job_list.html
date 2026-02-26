@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PlacementIQ &ndash; Browse Jobs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+      <a href="/home" class="flex items-center gap-2 font-semibold text-gray-900">
+        <span class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">P</span>
+        PlacementIQ
+      </a>
+      <div class="flex items-center gap-5 text-sm">
+        <a href="/jobs" class="text-indigo-600 font-semibold">Browse Jobs</a>
+        <a href="/" class="text-gray-500 hover:text-indigo-600 transition-colors font-medium">Analysis</a>
+        {% if user %}
+        <span class="text-gray-400">{{ user }}</span>
+        {% endif %}
+        <a href="/logout" class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="max-w-5xl mx-auto w-full px-6 mt-5 space-y-2">
+    {% for category, message in messages %}
+    <div class="rounded-lg px-4 py-3 text-sm
+      {% if category == 'error' %}bg-red-50 border border-red-200 text-red-700
+      {% elif category == 'success' %}bg-green-50 border border-green-200 text-green-700
+      {% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <main class="max-w-5xl mx-auto w-full px-6 py-10 flex-1">
+
+    <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-800">Job Listings</h1>
+        <p class="text-gray-400 text-sm mt-0.5">
+          {% if has_profile %}Sorted by profile match.{% else %}Run an analysis first to see match scores.{% endif %}
+        </p>
+      </div>
+      {% if not has_profile %}
+      <a href="/" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">Analyse Profile &rarr;</a>
+      {% endif %}
+    </div>
+
+    {% if jobs %}
+    <div class="space-y-4">
+      {% for job in jobs %}
+      {% set my_skills = session.get('candidate_profile', {}).get('resume_skills', []) + session.get('candidate_profile', {}).get('github_skills', []) %}
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 flex-wrap">
+              <h2 class="font-semibold text-gray-800">{{ job.title }}</h2>
+              <span class="text-gray-400 text-sm">&middot; {{ job.company }}</span>
+              {% if job._already_applied %}
+              <span class="bg-green-50 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">Applied</span>
+              {% endif %}
+            </div>
+            {% if job.description %}
+            <p class="text-gray-500 text-sm mt-2 line-clamp-2">{{ job.description }}</p>
+            {% endif %}
+            <!-- Skills -->
+            {% if job.required_skills %}
+            <div class="flex flex-wrap gap-1.5 mt-3">
+              {% for skill in job.required_skills %}
+              {% set matched = skill | lower in (my_skills | map('lower') | list) %}
+              <span class="px-2.5 py-1 rounded-md text-xs font-medium
+                {% if matched %}bg-indigo-50 text-indigo-600{% else %}bg-gray-100 text-gray-500{% endif %}">
+                {{ skill }}{% if matched %} &#10003;{% endif %}
+              </span>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <p class="text-gray-400 text-xs mt-3">Posted {{ job.created_at }}</p>
+          </div>
+          <div class="flex flex-col items-end gap-3 flex-shrink-0">
+            {% if has_profile %}
+            <div class="text-right">
+              <p class="text-xl font-bold text-indigo-600">{{ job._match_ratio | round(0) | int }}%</p>
+              <p class="text-xs text-gray-400">match</p>
+            </div>
+            <div class="w-24 bg-gray-200 rounded-full h-1.5">
+              <div class="bg-indigo-500 rounded-full h-1.5" style="width:{{ job._match_ratio | round(0) | int }}%"></div>
+            </div>
+            {% endif %}
+            {% if not job._already_applied %}
+            <form method="POST" action="/jobs/apply/{{ job.id }}">
+              <button type="submit"
+                      class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                Apply
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-16 text-center">
+      <p class="text-4xl mb-4">&#128269;</p>
+      <h3 class="font-semibold text-gray-700 mb-1">No jobs posted yet</h3>
+      <p class="text-gray-400 text-sm">Check back soon as recruiters post new openings.</p>
+    </div>
+    {% endif %}
+
+  </main>
+
+  <footer class="bg-white border-t border-gray-100 py-5 mt-8">
+    <p class="text-center text-gray-400 text-xs">PlacementIQ &middot; AI Placement Platform</p>
+  </footer>
+</body>
+</html>
