@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlacementIQ – AI Placement Analyser</title>
+  <style>
+    :root {
+      --bg:      #0f1117;
+      --surface: #1a1d2e;
+      --card:    #1e2235;
+      --border:  #2c3050;
+      --accent:  #6c63ff;
+      --accent2: #00d4aa;
+      --text:    #e8eaf6;
+      --sub:     #9fa8da;
+      --danger:  #ff6b6b;
+      --success: #69f0ae;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #12141f 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header .logo {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header span { font-size: 0.8rem; color: var(--sub); margin-left: 6px; }
+
+    /* ── Layout ── */
+    main {
+      max-width: 720px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .hero h2 {
+      font-size: 2rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: .5rem;
+    }
+    .hero p { color: var(--sub); font-size: 1rem; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .section-title {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: .75rem;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    /* ── Form ── */
+    form { display: flex; flex-direction: column; gap: 1.25rem; }
+    label { font-size: .85rem; color: var(--sub); margin-bottom: .3rem; display: block; }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      background: #12141f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: .6rem .9rem;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    select option { background: #1a1d2e; }
+
+    /* upload area */
+    .file-drop {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .file-drop:hover, .file-drop.drag { border-color: var(--accent); background: rgba(108,99,255,.05); }
+    .file-drop input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .file-icon { font-size: 2.5rem; margin-bottom: .5rem; }
+    .file-drop p { color: var(--sub); font-size: .9rem; }
+    .file-drop strong { color: var(--accent); }
+    #file-name { margin-top: .5rem; font-size: .8rem; color: var(--accent2); }
+
+    /* row grid */
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* submit */
+    button[type="submit"] {
+      background: linear-gradient(135deg, var(--accent), #9b59b6);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .85rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      margin-top: .5rem;
+    }
+    button[type="submit"]:hover { opacity: .9; transform: translateY(-1px); }
+    button[type="submit"]:active { transform: translateY(0); }
+
+    /* badges */
+    .badge-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+    .badge {
+      background: rgba(108,99,255,.15);
+      border: 1px solid rgba(108,99,255,.3);
+      border-radius: 20px;
+      padding: .25rem .65rem;
+      font-size: .75rem;
+      color: var(--sub);
+    }
+
+    /* Flash messages */
+    .flash { border-radius: 8px; padding: .75rem 1rem; margin-bottom: 1rem; font-size: .9rem; }
+    .flash.error   { background: rgba(255,107,107,.15); border: 1px solid rgba(255,107,107,.4); color: var(--danger); }
+    .flash.success { background: rgba(105,240,174,.12); border: 1px solid rgba(105,240,174,.3);  color: var(--success); }
+
+    /* loader */
+    .loader { display: none; text-align: center; color: var(--sub); font-size: .9rem; margin-top: .5rem; }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: inline-block;
+      margin-bottom: .4rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      text-align: center;
+      color: var(--sub);
+      font-size: .78rem;
+      margin: 3rem 0 2rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎯</div>
+  <div>
+    <h1>PlacementIQ<span>AI-Powered Placement Analysis</span></h1>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h2>Know Your Placement Readiness</h2>
+    <p>Upload your resume, link your profiles, and get an AI-driven skill report with a personalised roadmap.</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="card">
+    <form method="POST" action="/analyse" enctype="multipart/form-data" id="analyseForm">
+
+      <!-- Resume Upload -->
+      <div>
+        <p class="section-title">📄 Resume</p>
+        <div class="file-drop" id="fileDrop">
+          <input type="file" name="resume" id="resumeFile" accept=".pdf,.docx,.doc,.txt" required />
+          <div class="file-icon">📎</div>
+          <p><strong>Click to upload</strong> or drag &amp; drop</p>
+          <p>PDF, DOCX, or TXT · Max 5 MB</p>
+          <div id="file-name"></div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- External Profiles -->
+      <p class="section-title">🔗 External Profiles</p>
+      <div class="row">
+        <div>
+          <label for="github">GitHub Username</label>
+          <input type="text" id="github" name="github_username" placeholder="e.g. torvalds" />
+        </div>
+        <div>
+          <label for="leetcode">LeetCode Username</label>
+          <input type="text" id="leetcode" name="leetcode_username" placeholder="e.g. neal_wu" />
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Academic + Role -->
+      <p class="section-title">🎓 Academic &amp; Target Role</p>
+      <div class="row">
+        <div>
+          <label for="cgpa">CGPA (out of 10)</label>
+          <input type="number" id="cgpa" name="cgpa"
+                 placeholder="e.g. 8.5" min="0" max="10" step="0.01" />
+        </div>
+        <div>
+          <label for="target_role">Target Role <em style="font-weight:400">(optional)</em></label>
+          <select id="target_role" name="target_role">
+            <option value="">— Best match automatically —</option>
+            {% for role in available_roles %}
+              <option value="{{ role }}">{{ role }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <button type="submit" id="submitBtn">🚀 Analyse My Profile</button>
+      <div class="loader" id="loader">
+        <div class="spinner"></div><br/>Fetching GitHub &amp; LeetCode data · extracting skills · computing score…
+      </div>
+    </form>
+
+    <div class="badge-row" style="margin-top:1.5rem">
+      <span class="badge">📊 Skill Authenticity Score</span>
+      <span class="badge">🏆 Role Match Ranking</span>
+      <span class="badge">🔍 Skill Gap Analysis</span>
+      <span class="badge">🗺️ Personalised Roadmap</span>
+      <span class="badge">📈 Readiness Grade</span>
+    </div>
+  </div>
+</main>
+
+<footer>PlacementIQ · Built with Python Flask · All data processed server-side</footer>
+
+<script>
+  // Show selected filename
+  document.getElementById('resumeFile').addEventListener('change', function () {
+    const name = this.files[0] ? this.files[0].name : '';
+    document.getElementById('file-name').textContent = name ? '✅ ' + name : '';
+  });
+
+  // Drag-over styling
+  const drop = document.getElementById('fileDrop');
+  ['dragover','dragenter'].forEach(evt =>
+    drop.addEventListener(evt, e => { e.preventDefault(); drop.classList.add('drag'); })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    drop.addEventListener(evt, () => drop.classList.remove('drag'))
+  );
+
+  // Show loader on submit
+  document.getElementById('analyseForm').addEventListener('submit', function () {
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('loader').style.display = 'block';
+  });
+</script>
+</body>
+</html>

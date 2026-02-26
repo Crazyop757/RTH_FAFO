@@ -1,0 +1,69 @@
+{
+  "languages": [
+    "python", "java", "javascript", "typescript", "c", "c++", "c#", "go", "rust",
+    "kotlin", "swift", "ruby", "php", "scala", "r", "dart", "elixir", "haskell",
+    "perl", "matlab", "bash", "shell", "powershell", "sql", "html", "css"
+  ],
+  "frameworks_and_libraries": [
+    "react", "angular", "vue", "nextjs", "nuxtjs", "svelte", "django", "flask",
+    "fastapi", "spring", "springboot", "express", "nestjs", "laravel", "rails",
+    "asp.net", "dotnet", ".net", "pytorch", "tensorflow", "keras", "scikit-learn",
+    "sklearn", "pandas", "numpy", "scipy", "matplotlib", "seaborn", "plotly",
+    "opencv", "nltk", "spacy", "huggingface", "transformers", "langchain",
+    "bootstrap", "tailwind", "material-ui", "chakra-ui", "redux", "graphql",
+    "rest", "restful", "grpc", "socket.io", "celery", "rabbitmq", "kafka",
+    "hibernate", "sqlalchemy", "prisma", "mongoose", "jest", "pytest", "junit",
+    "selenium", "playwright", "cypress", "webpack", "vite", "babel"
+  ],
+  "databases": [
+    "mysql", "postgresql", "postgres", "sqlite", "mongodb", "redis", "cassandra",
+    "dynamodb", "firebase", "firestore", "elasticsearch", "neo4j", "oracle",
+    "mssql", "mariadb", "cockroachdb", "influxdb", "supabase", "planetscale"
+  ],
+  "cloud_and_devops": [
+    "aws", "azure", "gcp", "google cloud", "heroku", "vercel", "netlify",
+    "docker", "kubernetes", "k8s", "terraform", "ansible", "jenkins", "gitlab ci",
+    "github actions", "circleci", "travis ci", "helm", "prometheus", "grafana",
+    "nginx", "apache", "linux", "ubuntu", "debian", "centos", "cloudformation",
+    "lambda", "ec2", "s3", "rds", "ecs", "eks", "gke", "aks", "cloud run",
+    "bigquery", "cloudwatch", "datadog", "splunk", "elk stack"
+  ],
+  "machine_learning_and_ai": [
+    "machine learning", "deep learning", "neural networks", "nlp",
+    "natural language processing", "computer vision", "reinforcement learning",
+    "supervised learning", "unsupervised learning", "transfer learning",
+    "data science", "data analysis", "data engineering", "feature engineering",
+    "model deployment", "mlops", "llm", "large language models", "generative ai",
+    "rag", "vector database", "embedding", "fine-tuning", "xgboost", "lightgbm",
+    "random forest", "regression", "classification", "clustering", "time series",
+    "recommendation system", "object detection", "image segmentation"
+  ],
+  "tools_and_platforms": [
+    "git", "github", "gitlab", "bitbucket", "jira", "confluence", "notion",
+    "figma", "postman", "insomnia", "swagger", "openapi", "vscode", "intellij",
+    "pycharm", "eclipse", "vim", "linux", "macos", "windows", "wsl",
+    "jupyter", "google colab", "kaggle", "airflow", "spark", "hadoop",
+    "tableau", "power bi", "looker", "dbt", "snowflake", "databricks"
+  ],
+  "concepts_and_practices": [
+    "algorithms", "data structures", "system design", "oop", "object-oriented",
+    "functional programming", "microservices", "monolith", "event-driven",
+    "api design", "rest api", "graphql api", "clean code", "solid principles",
+    "design patterns", "tdd", "test-driven development", "bdd", "ci/cd",
+    "devops", "agile", "scrum", "kanban", "version control", "code review",
+    "unit testing", "integration testing", "e2e testing", "performance optimization",
+    "caching", "load balancing", "distributed systems", "concurrency", "multithreading",
+    "async programming", "websockets", "oauth", "jwt", "authentication",
+    "authorization", "security", "encryption", "networking", "tcp/ip", "http",
+    "dns", "web scraping", "automation", "scripting"
+  ],
+  "dsa_topics": [
+    "arrays", "strings", "linked list", "stack", "queue", "hash table",
+    "binary tree", "binary search tree", "heap", "trie", "graph", "dynamic programming",
+    "greedy", "backtracking", "divide and conquer", "sorting", "searching",
+    "bit manipulation", "recursion", "sliding window", "two pointers",
+    "depth-first search", "breadth-first search", "dfs", "bfs",
+    "shortest path", "topological sort", "union find", "segment tree",
+    "binary search", "matrix", "math"
+  ]
+}

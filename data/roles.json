@@ -1,0 +1,376 @@
+{
+  "Software Development Engineer": {
+    "description": "Build and maintain scalable software systems, write clean code, and collaborate with cross-functional teams.",
+    "required_skills": {
+      "core": {
+        "algorithms": 3,
+        "data structures": 3,
+        "system design": 3,
+        "oop": 2,
+        "design patterns": 2,
+        "version control": 2,
+        "git": 2,
+        "unit testing": 2,
+        "ci/cd": 2
+      },
+      "languages": {
+        "python": 2,
+        "java": 2,
+        "javascript": 2,
+        "c++": 2
+      },
+      "tools": {
+        "docker": 2,
+        "linux": 2,
+        "rest api": 2,
+        "sql": 2
+      }
+    },
+    "nice_to_have": ["kubernetes", "aws", "microservices", "kafka", "redis"],
+    "dsa_weight": 0.3,
+    "min_cgpa": 6.0
+  },
+  "Frontend Developer": {
+    "description": "Build responsive, performant web UIs and deliver exceptional user experiences.",
+    "required_skills": {
+      "core": {
+        "html": 3,
+        "css": 3,
+        "javascript": 3,
+        "typescript": 2,
+        "rest api": 2,
+        "git": 2,
+        "responsive design": 2
+      },
+      "frameworks": {
+        "react": 3,
+        "redux": 2
+      },
+      "tools": {
+        "webpack": 1,
+        "vite": 1,
+        "jest": 2,
+        "figma": 1
+      }
+    },
+    "nice_to_have": ["nextjs", "vue", "angular", "graphql", "tailwind", "typescript"],
+    "dsa_weight": 0.15,
+    "min_cgpa": 6.0
+  },
+  "Backend Developer": {
+    "description": "Design and implement server-side logic, APIs, databases, and system integrations.",
+    "required_skills": {
+      "core": {
+        "rest api": 3,
+        "sql": 3,
+        "algorithms": 2,
+        "data structures": 2,
+        "system design": 2,
+        "git": 2,
+        "authentication": 2,
+        "caching": 2
+      },
+      "languages": {
+        "python": 2,
+        "java": 2,
+        "javascript": 2
+      },
+      "frameworks": {
+        "django": 2,
+        "flask": 2,
+        "fastapi": 2,
+        "express": 2,
+        "springboot": 2
+      },
+      "databases": {
+        "postgresql": 2,
+        "mongodb": 2,
+        "redis": 2
+      }
+    },
+    "nice_to_have": ["kafka", "docker", "kubernetes", "microservices", "celery", "grpc"],
+    "dsa_weight": 0.25,
+    "min_cgpa": 6.0
+  },
+  "Full Stack Developer": {
+    "description": "Design and build complete web applications from frontend to backend.",
+    "required_skills": {
+      "core": {
+        "html": 2,
+        "css": 2,
+        "javascript": 3,
+        "rest api": 3,
+        "sql": 2,
+        "git": 2,
+        "system design": 2
+      },
+      "frontend": {
+        "react": 2
+      },
+      "backend": {
+        "nodejs": 2,
+        "express": 2
+      },
+      "databases": {
+        "mongodb": 2,
+        "postgresql": 2
+      },
+      "tools": {
+        "docker": 2,
+        "linux": 1
+      }
+    },
+    "nice_to_have": ["typescript", "nextjs", "redis", "aws", "graphql", "kubernetes"],
+    "dsa_weight": 0.2,
+    "min_cgpa": 6.0
+  },
+  "Data Scientist": {
+    "description": "Extract insights from data using statistical methods and machine learning algorithms.",
+    "required_skills": {
+      "core": {
+        "python": 3,
+        "machine learning": 3,
+        "statistics": 3,
+        "data analysis": 3,
+        "feature engineering": 2,
+        "sql": 2,
+        "git": 1
+      },
+      "libraries": {
+        "pandas": 3,
+        "numpy": 3,
+        "scikit-learn": 3,
+        "matplotlib": 2,
+        "seaborn": 2
+      },
+      "tools": {
+        "jupyter": 2,
+        "tableau": 1
+      }
+    },
+    "nice_to_have": ["deep learning", "pytorch", "tensorflow", "spark", "airflow", "mlops", "sql"],
+    "dsa_weight": 0.1,
+    "min_cgpa": 6.5
+  },
+  "Machine Learning Engineer": {
+    "description": "Build production ML systems, model pipelines, and scalable AI infrastructure.",
+    "required_skills": {
+      "core": {
+        "python": 3,
+        "machine learning": 3,
+        "deep learning": 3,
+        "mlops": 2,
+        "model deployment": 2,
+        "feature engineering": 2,
+        "algorithms": 2,
+        "data structures": 2,
+        "git": 2
+      },
+      "libraries": {
+        "pytorch": 3,
+        "tensorflow": 2,
+        "scikit-learn": 2,
+        "pandas": 2,
+        "numpy": 2
+      },
+      "tools": {
+        "docker": 2,
+        "kubernetes": 2,
+        "aws": 2,
+        "airflow": 2
+      }
+    },
+    "nice_to_have": ["spark", "kafka", "fastapi", "transformers", "huggingface", "rag", "llm"],
+    "dsa_weight": 0.2,
+    "min_cgpa": 7.0
+  },
+  "Data Engineer": {
+    "description": "Design and build pipelines that collect, store, and transform large-scale data.",
+    "required_skills": {
+      "core": {
+        "python": 3,
+        "sql": 3,
+        "data engineering": 3,
+        "etl": 2,
+        "algorithms": 2,
+        "data structures": 2,
+        "git": 2
+      },
+      "technologies": {
+        "spark": 3,
+        "kafka": 3,
+        "airflow": 2,
+        "hadoop": 2
+      },
+      "databases": {
+        "postgresql": 2,
+        "mongodb": 2,
+        "snowflake": 2,
+        "bigquery": 2
+      },
+      "tools": {
+        "docker": 2,
+        "aws": 2,
+        "dbt": 2
+      }
+    },
+    "nice_to_have": ["kubernetes", "databricks", "terraform", "scala", "redis", "elasticsearch"],
+    "dsa_weight": 0.15,
+    "min_cgpa": 6.0
+  },
+  "DevOps Engineer": {
+    "description": "Bridge development and operations through automation, CI/CD, and cloud infrastructure.",
+    "required_skills": {
+      "core": {
+        "linux": 3,
+        "ci/cd": 3,
+        "git": 3,
+        "scripting": 2,
+        "networking": 2,
+        "security": 2,
+        "automation": 2
+      },
+      "tools": {
+        "docker": 3,
+        "kubernetes": 3,
+        "terraform": 2,
+        "ansible": 2,
+        "jenkins": 2,
+        "github actions": 2,
+        "prometheus": 2,
+        "grafana": 2
+      },
+      "cloud": {
+        "aws": 3,
+        "azure": 2,
+        "gcp": 2
+      }
+    },
+    "nice_to_have": ["helm", "elk stack", "datadog", "python", "bash", "nginx"],
+    "dsa_weight": 0.1,
+    "min_cgpa": 6.0
+  },
+  "Cloud Engineer": {
+    "description": "Design, deploy, and manage cloud infrastructure and services for scalability and reliability.",
+    "required_skills": {
+      "core": {
+        "aws": 3,
+        "azure": 2,
+        "gcp": 2,
+        "networking": 2,
+        "security": 2,
+        "linux": 2,
+        "git": 2
+      },
+      "tools": {
+        "docker": 3,
+        "kubernetes": 3,
+        "terraform": 3,
+        "ci/cd": 2,
+        "cloudformation": 2
+      },
+      "services": {
+        "ec2": 2,
+        "s3": 2,
+        "rds": 2,
+        "lambda": 2,
+        "ecs": 2
+      }
+    },
+    "nice_to_have": ["ansible", "helm", "prometheus", "grafana", "datadog", "python"],
+    "dsa_weight": 0.1,
+    "min_cgpa": 6.0
+  },
+  "Mobile Developer": {
+    "description": "Build native or cross-platform mobile apps for iOS and Android.",
+    "required_skills": {
+      "core": {
+        "algorithms": 2,
+        "data structures": 2,
+        "oop": 2,
+        "rest api": 2,
+        "git": 2,
+        "unit testing": 2
+      },
+      "languages": {
+        "kotlin": 3,
+        "swift": 3,
+        "dart": 2,
+        "javascript": 2
+      },
+      "frameworks": {
+        "react native": 2,
+        "flutter": 2
+      },
+      "tools": {
+        "firebase": 2,
+        "android studio": 1
+      }
+    },
+    "nice_to_have": ["redux", "ci/cd", "aws", "sqlite", "graphql"],
+    "dsa_weight": 0.2,
+    "min_cgpa": 6.0
+  },
+  "Cybersecurity Engineer": {
+    "description": "Protect systems, networks, and data from threats through proactive security measures.",
+    "required_skills": {
+      "core": {
+        "networking": 3,
+        "security": 3,
+        "linux": 3,
+        "authentication": 2,
+        "encryption": 2,
+        "scripting": 2,
+        "git": 1
+      },
+      "tools": {
+        "python": 2,
+        "bash": 2,
+        "tcp/ip": 2,
+        "http": 2,
+        "dns": 2
+      },
+      "concepts": {
+        "penetration testing": 2,
+        "vulnerability assessment": 2,
+        "siem": 2
+      }
+    },
+    "nice_to_have": ["aws", "docker", "kubernetes", "splunk", "elk stack", "automation"],
+    "dsa_weight": 0.15,
+    "min_cgpa": 6.0
+  },
+  "AI/ML Research Engineer": {
+    "description": "Research and implement cutting-edge AI/ML techniques and contribute to publications.",
+    "required_skills": {
+      "core": {
+        "python": 3,
+        "machine learning": 3,
+        "deep learning": 3,
+        "natural language processing": 3,
+        "mathematics": 3,
+        "statistics": 3,
+        "research": 3,
+        "git": 2
+      },
+      "libraries": {
+        "pytorch": 3,
+        "tensorflow": 2,
+        "transformers": 3,
+        "huggingface": 2,
+        "numpy": 3,
+        "scipy": 2
+      },
+      "topics": {
+        "llm": 3,
+        "fine-tuning": 3,
+        "rag": 2,
+        "computer vision": 2,
+        "reinforcement learning": 2
+      }
+    },
+    "nice_to_have": ["langchain", "cuda", "distributed systems", "spark", "mlflow"],
+    "dsa_weight": 0.15,
+    "min_cgpa": 7.5
+  }
+}
