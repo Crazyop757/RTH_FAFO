@@ -16,6 +16,7 @@ GET  /health          → Simple health-check endpoint
 import os
 import json
 import logging
+import tempfile
 from typing import Optional
 
 from flask import (
@@ -24,12 +25,15 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-from resume_parser  import parse_resume_from_bytes
-from skill_engine   import analyse_skills
-from github_parser  import get_github_data
-from leetcode_parser import get_leetcode_data
-from role_engine    import analyse_role_fit
-from roadmap_engine import generate_roadmap
+from resume_parser   import extract_resume_text
+from skill_engine    import extract_resume_skills, merge_candidate_skills, compute_authenticity
+from github_parser   import get_github_profile
+from leetcode_parser import get_leetcode_stats
+from role_engine     import recommend_role, get_skill_gaps, compute_readiness
+from roadmap_engine  import generate_roadmap
+
+# Minimum non-empty text length considered a valid extraction
+_MIN_RESUME_CHARS = 40
 
 # --------------------------------------------------------------------------- #
 #  App configuration                                                           #
@@ -72,106 +76,205 @@ def _allowed_file(filename: str) -> bool:
     )
 
 
+def _parse_cgpa(raw: str) -> tuple:
+    """
+    Parse and clamp CGPA from a raw string.
+    Returns (cgpa_float_or_None, warning_str_or_None).
+    Never raises.
+    """
+    raw = raw.strip()
+    if not raw:
+        return None, None
+    try:
+        val = float(raw)
+    except ValueError:
+        return None, f"CGPA '{raw}' is not a valid number — ignored."
+    if val < 0.0:
+        return 0.0, f"CGPA {val} is below 0 — clamped to 0.0."
+    if val > 10.0:
+        return 10.0, f"CGPA {val} exceeds 10 — clamped to 10.0."
+    return val, None
+
+
 def _run_pipeline(
-    resume_bytes:   bytes,
+    resume_bytes:    bytes,
     resume_filename: str,
-    github_user:    str,
-    leetcode_user:  str,
-    cgpa:           Optional[float],
-    target_role:    Optional[str],
+    github_user:     str,
+    leetcode_user:   str,
+    cgpa:            Optional[float],
+    target_role:     Optional[str],
+    pre_warnings:    Optional[list] = None,
 ) -> dict:
     """
-    Execute the full analysis pipeline and return a structured result dict.
-    All steps handle missing / failed data gracefully.
+    Execute the flat 10-step analysis pipeline.
+    Every step is individually guarded; failures produce safe defaults.
+    Accumulates human-readable warnings so the report can surface them.
+    Always returns a complete result dict — never raises.
     """
-    pipeline_log = []
+    warnings: list = list(pre_warnings or [])
 
-    # ── Step 1: Parse Resume ─────────────────────────────────────────────────
-    logger.info("Parsing resume: %s", resume_filename)
-    resume_result = parse_resume_from_bytes(resume_bytes, resume_filename)
-    pipeline_log.append({
-        "step":    "resume_parser",
-        "success": resume_result["success"],
-        "detail":  resume_result.get("error", ""),
-    })
-    raw_text = resume_result.get("raw_text", "")
+    # ── Step 1: Save resume to temp file & extract text ─────────────────────
+    logger.info("Extracting text from resume: %s", resume_filename)
+    suffix   = os.path.splitext(resume_filename)[1] or ".tmp"
+    tmp_path = None
+    text     = ""
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            tmp.write(resume_bytes)
+            tmp_path = tmp.name
+        text = extract_resume_text(tmp_path)
+    except Exception as exc:
+        logger.warning("extract_resume_text failed: %s", exc)
+        warnings.append(f"Resume text extraction failed ({exc}). Results may be incomplete.")
+    finally:
+        if tmp_path:
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
 
-    # ── Step 2: GitHub data ──────────────────────────────────────────────────
-    github_data = {}
-    if github_user:
-        logger.info("Fetching GitHub data for: %s", github_user)
-        github_data = get_github_data(github_user, token=GITHUB_TOKEN)
-        pipeline_log.append({
-            "step":    "github_parser",
-            "success": github_data.get("success", False),
-            "detail":  github_data.get("error", ""),
-        })
+    if not text or len(text.strip()) < _MIN_RESUME_CHARS:
+        warnings.append(
+            "Resume text is very short or empty — skill extraction may be limited. "
+            "Try a text-selectable PDF or a DOCX file."
+        )
+
+    # ── Step 2: Resume skills ────────────────────────────────────────────────
+    logger.info("Extracting resume skills")
+    try:
+        resume_skills = extract_resume_skills(text)
+    except Exception as exc:
+        logger.warning("extract_resume_skills failed: %s", exc)
+        warnings.append("Could not extract skills from resume text.")
+        resume_skills = []
+
+    if not resume_skills:
+        warnings.append("No recognisable skills found in the resume.")
+
+    # ── Step 3: GitHub profile ───────────────────────────────────────────────
+    logger.info("Fetching GitHub profile: %s", github_user or "(none)")
+    if not github_user:
+        warnings.append("No GitHub username provided — GitHub skills and repo count will be 0.")
+        github = {"verified_skills": [], "repo_count": 0}
     else:
-        pipeline_log.append({"step": "github_parser", "success": False, "detail": "No username provided"})
+        try:
+            github = get_github_profile(github_user)
+            if not github.get("verified_skills") and github.get("repo_count", 0) == 0:
+                warnings.append(
+                    f"GitHub profile '{github_user}' returned no data. "
+                    "The account may be private, not found, or rate-limited."
+                )
+        except Exception as exc:
+            logger.warning("get_github_profile failed: %s", exc)
+            warnings.append(f"GitHub API call failed ({exc}). Continuing without GitHub data.")
+            github = {"verified_skills": [], "repo_count": 0}
 
-    # ── Step 3: LeetCode data ────────────────────────────────────────────────
-    leetcode_data = {}
-    if leetcode_user:
-        logger.info("Fetching LeetCode data for: %s", leetcode_user)
-        leetcode_data = get_leetcode_data(leetcode_user)
-        pipeline_log.append({
-            "step":    "leetcode_parser",
-            "success": leetcode_data.get("success", False),
-            "detail":  leetcode_data.get("error", ""),
-        })
+    github_skills = github.get("verified_skills") or []
+    repo_count    = github.get("repo_count") or 0
+
+    # ── Step 4: LeetCode stats ───────────────────────────────────────────────
+    logger.info("Fetching LeetCode stats: %s", leetcode_user or "(none)")
+    _lc_zero = {"total": 0, "easy": 0, "medium": 0, "hard": 0}
+    if not leetcode_user:
+        warnings.append("No LeetCode username provided — coding activity score will be 0.")
+        leetcode_stats = _lc_zero
     else:
-        pipeline_log.append({"step": "leetcode_parser", "success": False, "detail": "No username provided"})
+        try:
+            leetcode_stats = get_leetcode_stats(leetcode_user)
+            if leetcode_stats.get("total", 0) == 0:
+                warnings.append(
+                    f"LeetCode profile '{leetcode_user}' returned 0 solved problems. "
+                    "The username may be incorrect or the account has no accepted submissions."
+                )
+        except Exception as exc:
+            logger.warning("get_leetcode_stats failed: %s", exc)
+            warnings.append(f"LeetCode API call failed ({exc}). Continuing without LeetCode data.")
+            leetcode_stats = _lc_zero
 
-    # ── Step 4: Skill Analysis ───────────────────────────────────────────────
-    logger.info("Analysing skills")
-    skill_analysis = analyse_skills(
-        resume_text   = raw_text,
-        github_data   = github_data,
-        leetcode_data = leetcode_data,
-    )
-    pipeline_log.append({"step": "skill_engine", "success": True, "detail": ""})
+    # ── Step 5: Merge candidate skills ───────────────────────────────────────
+    logger.info("Merging candidate skills")
+    try:
+        candidate_skills = merge_candidate_skills(resume_skills, github_skills)
+    except Exception as exc:
+        logger.warning("merge_candidate_skills failed: %s", exc)
+        candidate_skills = sorted(set(s.lower() for s in (resume_skills + github_skills) if s))
 
-    # ── Step 5: Role Fit & Gaps ──────────────────────────────────────────────
-    logger.info("Analysing role fit")
-    role_analysis = analyse_role_fit(
-        candidate_skills = skill_analysis["candidate_skills"],
-        authenticity     = skill_analysis["authenticity"],
-        leetcode_data    = leetcode_data,
-        cgpa             = cgpa,
-        target_role      = target_role,
-        top_n            = 5,
-    )
-    pipeline_log.append({"step": "role_engine", "success": True, "detail": ""})
+    # ── Step 6: Authenticity score ───────────────────────────────────────────
+    try:
+        authenticity = compute_authenticity(resume_skills, github_skills)
+    except Exception as exc:
+        logger.warning("compute_authenticity failed: %s", exc)
+        authenticity = 0.0
 
-    # ── Step 6: Roadmap ──────────────────────────────────────────────────────
+    # ── Step 7: Role recommendation ──────────────────────────────────────────
+    logger.info("Recommending role")
+    _fallback_role = target_role or "Software Development Engineer"
+    try:
+        if candidate_skills:
+            role, match = recommend_role(candidate_skills)
+        else:
+            role  = _fallback_role
+            match = 0.0
+            warnings.append("No candidate skills found — role recommendation defaulted.")
+    except Exception as exc:
+        logger.warning("recommend_role failed: %s", exc)
+        role  = _fallback_role
+        match = 0.0
+
+    # If caller supplied a target_role override, respect it for gaps/roadmap
+    effective_role = target_role if target_role else role
+
+    # ── Step 8: Skill gaps ───────────────────────────────────────────────────
+    try:
+        gaps = get_skill_gaps(candidate_skills, effective_role)
+    except Exception as exc:
+        logger.warning("get_skill_gaps failed: %s", exc)
+        gaps = []
+
+    # ── Step 9: Readiness score ──────────────────────────────────────────────
+    try:
+        readiness = compute_readiness(
+            match,
+            authenticity,
+            leetcode_stats.get("total", 0),
+            repo_count,
+            cgpa if cgpa is not None else 0.0,
+        )
+    except Exception as exc:
+        logger.warning("compute_readiness failed: %s", exc)
+        readiness = 0.0
+
+    if cgpa is None:
+        warnings.append("No CGPA provided — readiness score calculated with CGPA = 0.")
+
+    # ── Step 10: Roadmap ─────────────────────────────────────────────────────
     logger.info("Generating roadmap")
-    roadmap = generate_roadmap(
-        skill_gaps       = role_analysis["skill_gaps"],
-        candidate_skills = skill_analysis["candidate_skills"],
-        role_name        = role_analysis["primary_role"],
-        leetcode_data    = leetcode_data,
-    )
-    pipeline_log.append({"step": "roadmap_engine", "success": True, "detail": ""})
+    try:
+        roadmap = generate_roadmap(gaps, effective_role)
+    except Exception as exc:
+        logger.warning("generate_roadmap failed: %s", exc)
+        roadmap = []
 
     return {
-        # Input echo
-        "input": {
+        "resume_skills":  resume_skills,
+        "github_skills":  github_skills,
+        "repo_count":     repo_count,
+        "leetcode_stats": leetcode_stats,
+        "authenticity":   authenticity,
+        "role":           effective_role,
+        "match":          match,
+        "readiness":      readiness,
+        "gaps":           gaps,
+        "roadmap":        roadmap,
+        "warnings":       warnings,
+        # input echo for the report header
+        "meta": {
             "resume_filename": resume_filename,
-            "github_user":     github_user,
-            "leetcode_user":   leetcode_user,
+            "github_user":     github_user or None,
+            "leetcode_user":   leetcode_user or None,
             "cgpa":            cgpa,
             "target_role":     target_role,
         },
-        # Raw parsers
-        "resume":      resume_result,
-        "github":      github_data,
-        "leetcode":    leetcode_data,
-        # Derived analytics
-        "skills":      skill_analysis,
-        "role":        role_analysis,
-        "roadmap":     roadmap,
-        # Meta
-        "pipeline_log": pipeline_log,
     }
 
 
@@ -187,40 +290,36 @@ def index():
 
 @app.route("/analyse", methods=["POST"])
 def analyse():
-    """Handle form submission and render the report."""
-    # ── Validate file ────────────────────────────────────────────────────────
-    if "resume" not in request.files:
-        flash("No file uploaded.", "error")
+    """Handle form submission and always render a report, even on partial data."""
+    pre_warnings: list = []
+
+    # ── Hard-fail only: no file at all, or wrong type ────────────────────────
+    if "resume" not in request.files or request.files["resume"].filename == "":
+        flash("Please select a resume file to upload.", "error")
         return redirect(url_for("index"))
 
     file = request.files["resume"]
-    if file.filename == "":
-        flash("No file selected.", "error")
-        return redirect(url_for("index"))
-
     if not _allowed_file(file.filename):
-        flash("Unsupported file type. Upload a PDF, DOCX, or TXT.", "error")
+        flash("Unsupported file type. Please upload a PDF, DOCX, or TXT file.", "error")
         return redirect(url_for("index"))
 
     filename  = secure_filename(file.filename)
     raw_bytes = file.read()
 
-    # ── Form fields ──────────────────────────────────────────────────────────
+    if not raw_bytes:
+        flash("The uploaded file appears to be empty.", "error")
+        return redirect(url_for("index"))
+
+    # ── Form fields (soft-fail everything else) ──────────────────────────────
     github_user   = request.form.get("github_username",   "").strip()
     leetcode_user = request.form.get("leetcode_username", "").strip()
     target_role   = request.form.get("target_role",       "").strip() or None
 
-    cgpa_raw = request.form.get("cgpa", "").strip()
-    try:
-        cgpa = float(cgpa_raw) if cgpa_raw else None
-        if cgpa is not None and not (0.0 <= cgpa <= 10.0):
-            flash("CGPA must be between 0 and 10.", "error")
-            return redirect(url_for("index"))
-    except ValueError:
-        flash("Invalid CGPA value.", "error")
-        return redirect(url_for("index"))
+    cgpa, cgpa_warn = _parse_cgpa(request.form.get("cgpa", ""))
+    if cgpa_warn:
+        pre_warnings.append(cgpa_warn)
 
-    # ── Run pipeline ──────────────────────────────────────────────────────────
+    # ── Run pipeline — always produces a report ──────────────────────────────
     try:
         result = _run_pipeline(
             resume_bytes    = raw_bytes,
@@ -229,18 +328,23 @@ def analyse():
             leetcode_user   = leetcode_user,
             cgpa            = cgpa,
             target_role     = target_role,
+            pre_warnings    = pre_warnings,
         )
     except Exception as exc:
-        logger.exception("Pipeline error: %s", exc)
-        flash(f"An internal error occurred: {exc}", "error")
-        return redirect(url_for("index"))
-
-    if not result["resume"]["success"]:
-        flash(
-            f"Resume parsing failed: {result['resume']['error']}",
-            "error",
-        )
-        return redirect(url_for("index"))
+        # Absolute last-resort fallback — should never be reached
+        logger.exception("Unhandled pipeline error: %s", exc)
+        result = {
+            "resume_skills": [], "github_skills": [], "repo_count": 0,
+            "leetcode_stats": {"total": 0, "easy": 0, "medium": 0, "hard": 0},
+            "authenticity": 0.0, "role": target_role or "Unknown",
+            "match": 0.0, "readiness": 0.0, "gaps": [], "roadmap": [],
+            "warnings": pre_warnings + [f"An unexpected error occurred: {exc}"],
+            "meta": {
+                "resume_filename": filename, "github_user": github_user or None,
+                "leetcode_user": leetcode_user or None, "cgpa": cgpa,
+                "target_role": target_role,
+            },
+        }
 
     return render_template("report.html", result=result)
 
@@ -267,25 +371,25 @@ def api_analyse():
         cgpa             – float string
         target_role      – string
     """
-    if "resume" not in request.files:
+    if "resume" not in request.files or request.files["resume"].filename == "":
         return jsonify({"error": "No resume file uploaded."}), 400
 
     file = request.files["resume"]
-    if not file or not _allowed_file(file.filename):
-        return jsonify({"error": "Unsupported or missing file."}), 400
+    if not _allowed_file(file.filename):
+        return jsonify({"error": "Unsupported file type. Use PDF, DOCX, or TXT."}), 400
 
     filename  = secure_filename(file.filename)
     raw_bytes = file.read()
+
+    if not raw_bytes:
+        return jsonify({"error": "Uploaded file is empty."}), 400
 
     github_user   = request.form.get("github_username",   "").strip()
     leetcode_user = request.form.get("leetcode_username", "").strip()
     target_role   = request.form.get("target_role",       "").strip() or None
 
-    cgpa_raw = request.form.get("cgpa", "").strip()
-    try:
-        cgpa = float(cgpa_raw) if cgpa_raw else None
-    except ValueError:
-        return jsonify({"error": "Invalid CGPA."}), 400
+    cgpa, cgpa_warn = _parse_cgpa(request.form.get("cgpa", ""))
+    pre_warnings = [cgpa_warn] if cgpa_warn else []
 
     try:
         result = _run_pipeline(
@@ -295,6 +399,7 @@ def api_analyse():
             leetcode_user   = leetcode_user,
             cgpa            = cgpa,
             target_role     = target_role,
+            pre_warnings    = pre_warnings,
         )
     except Exception as exc:
         logger.exception("API pipeline error: %s", exc)

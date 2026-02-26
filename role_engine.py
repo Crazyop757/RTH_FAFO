@@ -88,7 +88,115 @@ def _cgpa_multiplier(cgpa: Optional[float], min_cgpa: float) -> float:
 
 
 # --------------------------------------------------------------------------- #
-#  Public API – role recommendation                                            #
+#  Public API – simple role recommendation (primary function)                 #
+# --------------------------------------------------------------------------- #
+
+def recommend_role(candidate_skills: list) -> tuple:
+    """
+    Return the single best-matching role and its match ratio.
+
+    Algorithm
+    ---------
+    For every role in roles.json::
+
+        required      = flat set of all required skill names
+        match_ratio   = |intersection(candidate, required)| / |required|
+
+    The role with the highest ``match_ratio`` is returned.
+
+    Parameters
+    ----------
+    candidate_skills : list[str]
+        Merged skill list produced by ``skill_engine.merge_candidate_skills()``.
+
+    Returns
+    -------
+    tuple[str, float]
+        ``(role_name, match_ratio)``
+        ``role_name``   – name of the best-matching role (empty string when
+                          roles.json is empty or candidate list is empty)
+        ``match_ratio`` – fraction of required skills covered, in ``[0.0, 1.0]``
+
+    Examples
+    --------
+    >>> recommend_role(["python", "flask", "sql", "docker"])
+    ('Backend Developer', 0.3333...)
+    """
+    if not candidate_skills or not _ROLES:
+        return ("", 0.0)
+
+    candidate_set = {s.lower() for s in candidate_skills}
+    best_role     = ""
+    best_ratio    = -1.0
+
+    for role_name, role_data in _ROLES.items():
+        flat_req      = _flatten_required(role_data)
+        required_count = len(flat_req)
+        if required_count == 0:
+            continue
+
+        matched     = sum(1 for skill in flat_req if skill in candidate_set)
+        match_ratio = matched / required_count
+
+        if match_ratio > best_ratio:
+            best_ratio = match_ratio
+            best_role  = role_name
+
+    return (best_role, round(best_ratio, 4))
+
+
+# --------------------------------------------------------------------------- #
+#  Public API – simple skill gap list (primary function)                      #
+# --------------------------------------------------------------------------- #
+
+def get_skill_gaps(candidate_skills: list, role: str) -> list:
+    """
+    Return the required skills the candidate is missing for *role*.
+
+    Formula
+    -------
+    ``gaps = required_skills(role) − candidate_skills``
+
+    Parameters
+    ----------
+    candidate_skills : list[str]
+        Merged skill list from ``skill_engine.merge_candidate_skills()``.
+    role : str
+        Role name exactly as it appears in roles.json.  A case-insensitive
+        fallback is attempted when an exact match is not found.
+
+    Returns
+    -------
+    list[str]
+        Sorted list of lowercase skill names the candidate lacks.
+        Returns an empty list when the role is not found.
+
+    Examples
+    --------
+    >>> get_skill_gaps(["python", "docker"], "Backend Developer")
+    ['postgresql', 'redis', 'rest api', ...]
+    """
+    role_data = _ROLES.get(role)
+    if not role_data:
+        # case-insensitive fallback
+        for rname, rdata in _ROLES.items():
+            if rname.lower() == role.lower():
+                role_data = rdata
+                break
+
+    if not role_data:
+        logger.warning("get_skill_gaps: role '%s' not found in roles.json", role)
+        return []
+
+    candidate_set = {s.lower() for s in (candidate_skills or [])}
+    flat_req      = _flatten_required(role_data)
+
+    gaps = sorted(skill for skill in flat_req if skill not in candidate_set)
+    return gaps
+
+
+# --------------------------------------------------------------------------- #
+#  Public API – ranked role recommendation (full version, kept for app.py)   #
 # --------------------------------------------------------------------------- #
 
 def recommend_roles(
@@ -146,10 +254,76 @@ def recommend_roles(
 
 
 # --------------------------------------------------------------------------- #
-#  Public API – readiness score for a specific role                           #
+#  Public API – simple readiness score (primary function)                     #
 # --------------------------------------------------------------------------- #
 
 def compute_readiness(
+    match_score:     float,
+    authenticity:    float,
+    leetcode_total:  int,
+    repo_count:      int,
+    cgpa:            float,
+) -> float:
+    """
+    Compute a 0–100 readiness score from normalised component inputs.
+
+    Normalisation
+    -------------
+    * ``match_score``  – already in ``[0.0, 1.0]`` (fraction of required skills matched)
+    * ``authenticity`` – already in ``[0.0, 1.0]`` (from ``compute_authenticity``)
+    * ``leetcode_norm = min(1.0, leetcode_total / 300)``
+    * ``repo_norm     = min(1.0, repo_count    / 10)``
+    * ``cgpa_norm     = cgpa / 10``  (assumes 10-point scale)
+
+    Weights
+    -------
+    =============  ======
+    Component      Weight
+    =============  ======
+    Skill match    0.40
+    Authenticity   0.20
+    LeetCode DSA   0.20
+    GitHub repos   0.10
+    CGPA           0.10
+    =============  ======
+
+    Parameters
+    ----------
+    match_score    : float – fraction ``[0, 1]`` of role required skills matched
+    authenticity   : float – resume-vs-github verification ratio ``[0, 1]``
+    leetcode_total : int   – total accepted LeetCode submissions
+    repo_count     : int   – number of public GitHub repositories
+    cgpa           : float – CGPA on a 10-point scale
+
+    Returns
+    -------
+    float
+        Readiness percentage in ``[0.0, 100.0]``, rounded to 2 decimal places.
+    """
+    leetcode_norm = min(1.0, max(0.0, leetcode_total) / 300)
+    repo_norm     = min(1.0, max(0.0, repo_count)     / 10)
+    cgpa_norm     = min(1.0, max(0.0, cgpa)           / 10)
+
+    # Clamp inputs that should already be in [0, 1]
+    match_score   = max(0.0, min(1.0, match_score))
+    authenticity  = max(0.0, min(1.0, authenticity))
+
+    raw = (
+        0.40 * match_score
+        + 0.20 * authenticity
+        + 0.20 * leetcode_norm
+        + 0.10 * repo_norm
+        + 0.10 * cgpa_norm
+    )
+
+    return round(max(0.0, min(100.0, raw * 100)), 2)
+
+
+# --------------------------------------------------------------------------- #
+#  Public API – detailed readiness score for a role  (kept for app.py)       #
+# --------------------------------------------------------------------------- #
+
+def compute_readiness_full(
     role_name:        str,
     candidate_skills: list,
     authenticity:     dict,
@@ -358,7 +532,7 @@ def analyse_role_fit(
     else:
         primary_role = recommendations[0]["role"] if recommendations else ""
 
-    readiness  = compute_readiness(
+    readiness  = compute_readiness_full(
         role_name        = primary_role,
         candidate_skills = candidate_skills,
         authenticity     = authenticity,
@@ -373,3 +547,135 @@ def analyse_role_fit(
         "readiness":         readiness,
         "skill_gaps":        skill_gaps,
     }
+
+
+# --------------------------------------------------------------------------- #
+#  Self-tests                                                                  #
+# --------------------------------------------------------------------------- #
+
+if __name__ == "__main__":
+    _PASS = "\033[92mPASS\033[0m"
+    _FAIL = "\033[91mFAIL\033[0m"
+    _results: list = []
+
+    def _check(label: str, condition: bool) -> None:
+        tag = _PASS if condition else _FAIL
+        print(f"  [{tag}] {label}")
+        _results.append(condition)
+
+    print("\n=== role_engine self-tests ===\n")
+
+    # --- compute_readiness ---
+    print("compute_readiness()")
+
+    r = compute_readiness(0.0, 0.0, 0, 0, 0.0)
+    _check("all zeros -> 0.0",  r == 0.0)
+
+    r = compute_readiness(1.0, 1.0, 300, 10, 10.0)
+    _check("perfect inputs -> 100.0",  r == 100.0)
+
+    r = compute_readiness(0.5, 0.5, 150, 5, 5.0)
+    _check("half inputs -> 50.0",  r == 50.0)
+
+    # weight check: match (0.4) dominates
+    r_high_match = compute_readiness(1.0, 0.0, 0, 0, 0.0)
+    r_high_auth  = compute_readiness(0.0, 1.0, 0, 0, 0.0)
+    _check("match weight 0.4 -> 40.0",  r_high_match == 40.0)
+    _check("auth weight 0.2 -> 20.0",   r_high_auth  == 20.0)
+
+    # leetcode_norm capped at 1 (600 -> norm 1.0, weight 0.2 -> 20pts)
+    r = compute_readiness(0.0, 0.0, 600, 0, 0.0)
+    _check("leetcode 600 capped -> 20.0",  r == 20.0)
+
+    # repo_norm (weight 0.1)
+    r = compute_readiness(0.0, 0.0, 0, 10, 0.0)
+    _check("10 repos -> 10.0",  r == 10.0)
+
+    r = compute_readiness(0.0, 0.0, 0, 20, 0.0)
+    _check("20 repos capped -> 10.0",  r == 10.0)
+
+    # cgpa_norm (weight 0.1), 10-point scale
+    r = compute_readiness(0.0, 0.0, 0, 0, 10.0)
+    _check("cgpa 10.0 -> 10.0",  r == 10.0)
+
+    # clamp: negative inputs treated as 0
+    r = compute_readiness(-0.5, -1.0, -10, -5, -2.0)
+    _check("negative inputs clamped to 0.0",  r == 0.0)
+
+    # return is float in [0, 100]
+    r = compute_readiness(0.75, 0.6, 120, 8, 8.5)
+    _check("result is float",        isinstance(r, float))
+    _check("result in [0, 100]",     0.0 <= r <= 100.0)
+
+    # --- recommend_role ---
+    print("recommend_role()")
+
+    role, ratio = recommend_role([])
+    _check("empty skills -> ('', 0.0)",  role == "" and ratio == 0.0)
+
+    role, ratio = recommend_role(["python", "react", "javascript",
+                                   "html", "css", "typescript",
+                                   "redux", "jest", "rest api", "git"])
+    _check("frontend-heavy skills -> Frontend Developer",
+           "frontend" in role.lower() or "frontend" in role.lower())
+    _check("ratio in [0, 1]",             0.0 <= ratio <= 1.0)
+
+    role, ratio = recommend_role(["python", "flask", "django",
+                                   "postgresql", "redis", "rest api",
+                                   "docker", "sql", "git"])
+    _check("backend-heavy skills -> Backend Developer",
+           "backend" in role.lower())
+    _check("ratio > 0",  ratio > 0.0)
+
+    role2, ratio2 = recommend_role(["python"])
+    role3, ratio3 = recommend_role(["python", "java", "c++", "docker",
+                                     "sql", "algorithms", "data structures"])
+    _check("more skills -> higher or equal ratio", ratio3 >= ratio2)
+
+    # --- get_skill_gaps ---
+    print("\nget_skill_gaps()")
+
+    gaps = get_skill_gaps([], "Frontend Developer")
+    _check("no skills -> all required are gaps",  len(gaps) > 0)
+    _check("gaps is a list",                      isinstance(gaps, list))
+    _check("gaps are sorted",                     gaps == sorted(gaps))
+
+    gaps = get_skill_gaps(
+        ["html", "css", "javascript", "typescript",
+         "react", "redux", "jest", "webpack", "vite",
+         "figma", "rest api", "git", "responsive design"],
+        "Frontend Developer",
+    )
+    _check("all required present -> gaps []",  gaps == [])
+
+    gaps = get_skill_gaps(["python", "docker"], "Backend Developer")
+    _check("docker present -> 'docker' not in gaps",  "docker" not in gaps)
+    _check("python present -> 'python' not in gaps",  "python" not in gaps)
+    _check("missing skills appear in gaps",           len(gaps) > 0)
+
+    gaps = get_skill_gaps(["python"], "__nonexistent_role__")
+    _check("unknown role -> []",  gaps == [])
+
+    # case-insensitive role lookup
+    gaps_exact = get_skill_gaps(["python"], "Backend Developer")
+    gaps_ci    = get_skill_gaps(["python"], "backend developer")
+    _check("case-insensitive role match",  gaps_exact == gaps_ci)
+
+    # --- interaction: recommend_role then get_skill_gaps ---
+    print("\nrecommend_role -> get_skill_gaps pipeline")
+
+    candidate = ["python", "flask", "postgresql", "docker", "rest api"]
+    best_role, score = recommend_role(candidate)
+    gaps = get_skill_gaps(candidate, best_role)
+    _check("pipeline: best role is non-empty",          bool(best_role))
+    _check("pipeline: score in [0, 1]",                 0.0 <= score <= 1.0)
+    _check("pipeline: gaps is a list",                  isinstance(gaps, list))
+    _check("pipeline: no gap skill is in candidate",
+           all(g not in {s.lower() for s in candidate} for g in gaps))
+
+    print()
+    passed = sum(_results)
+    total  = len(_results)
+    print(f"Results: {passed}/{total} passed")
+    if passed < total:
+        raise SystemExit(1)

@@ -1,589 +1,325 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlacementIQ – Analysis Report</title>
+  <title>PlacementIQ - Analysis Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: "#1a1d2e",
+            card:    "#1e2235",
+            border:  "#2c3050",
+            accent:  "#6c63ff",
+            teal:    "#00d4aa",
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    :root {
-      --bg:      #0f1117;
-      --surface: #1a1d2e;
-      --card:    #1e2235;
-      --border:  #2c3050;
-      --accent:  #6c63ff;
-      --accent2: #00d4aa;
-      --text:    #e8eaf6;
-      --sub:     #9fa8da;
-      --danger:  #ff6b6b;
-      --warn:    #ffd54f;
-      --success: #69f0ae;
-      --orange:  #ffab40;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; }
-
-    /* ── Header ── */
-    header {
-      background: linear-gradient(135deg, #1a1d2e 0%, #12141f 100%);
-      border-bottom: 1px solid var(--border);
-      padding: 1.2rem 2rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    header .logo-row { display: flex; align-items: center; gap: .75rem; }
-    header .logo {
-      width: 38px; height: 38px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-    }
-    header h1 { font-size: 1.3rem; }
-    header a { color: var(--sub); text-decoration: none; font-size: .85rem; }
-    header a:hover { color: var(--accent2); }
-
-    /* ── Layout ── */
-    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
-    @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-
-    /* ── Cards ── */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.4rem 1.6rem;
-    }
-    .card-title {
-      font-size: .7rem; letter-spacing: .08em; text-transform: uppercase;
-      color: var(--accent2); font-weight: 600; margin-bottom: .9rem;
-    }
-    .divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
-
-    /* ── Score ring ── */
-    .score-hero { text-align: center; }
-    .ring-wrap { position: relative; width: 130px; height: 130px; margin: 0 auto .75rem; }
-    .ring-wrap svg { transform: rotate(-90deg); }
-    .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
-    .ring-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .8s; }
-    .ring-text {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .ring-score { font-size: 1.8rem; font-weight: 700; }
-    .ring-grade { font-size: .8rem; color: var(--sub); }
-    .score-label { font-size: .85rem; color: var(--sub); }
-
-    /* Grade colours */
-    .grade-A { color: var(--success); }
-    .grade-B { color: var(--accent2); }
-    .grade-C { color: var(--warn); }
-    .grade-D { color: var(--orange); }
-    .grade-F { color: var(--danger); }
-
-    /* Ring colour per grade */
-    .ring-A { stroke: var(--success); }
-    .ring-B { stroke: var(--accent2); }
-    .ring-C { stroke: var(--warn); }
-    .ring-D { stroke: var(--orange); }
-    .ring-F { stroke: var(--danger); }
-
-    /* ── Stats row ── */
-    .stat-row { display: flex; justify-content: space-between; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
-    .stat { text-align: center; flex: 1; min-width: 60px; }
-    .stat .val { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
-    .stat .lbl { font-size: .7rem; color: var(--sub); }
-
-    /* ── Progress bar ── */
-    .prog-row { display: flex; align-items: center; gap: .7rem; margin-bottom: .55rem; }
-    .prog-label { font-size: .82rem; color: var(--text); min-width: 110px; }
-    .prog-bar { flex: 1; height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
-    .prog-fill { height: 100%; border-radius: 4px; transition: width .6s; }
-    .prog-val  { font-size: .75rem; color: var(--sub); min-width: 36px; text-align: right; }
-
-    /* ── Skill chips ── */
-    .chip-area { display: flex; flex-wrap: wrap; gap: .45rem; }
-    .chip {
-      font-size: .75rem; border-radius: 20px; padding: .22rem .65rem;
-      border: 1px solid; white-space: nowrap;
-    }
-    .chip-resume   { background: rgba(108,99,255,.15); border-color: rgba(108,99,255,.35); color: var(--accent); }
-    .chip-github   { background: rgba(0,212,170,.12);  border-color: rgba(0,212,170,.3);  color: var(--accent2); }
-    .chip-leetcode { background: rgba(255,171,64,.12); border-color: rgba(255,171,64,.35); color: var(--orange); }
-    .chip-verified { background: rgba(105,240,174,.1); border-color: rgba(105,240,174,.35); color: var(--success); }
-    .chip-gap-crit { background: rgba(255,107,107,.12); border-color: rgba(255,107,107,.35); color: var(--danger); font-weight: 600; }
-    .chip-gap-imp  { background: rgba(255,213,79,.1);  border-color: rgba(255,213,79,.35); color: var(--warn); }
-    .chip-gap-rec  { background: rgba(159,168,218,.1); border-color: rgba(159,168,218,.3); color: var(--sub); }
-
-    /* ── Role cards ── */
-    .role-card {
-      background: #12141f;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-bottom: .65rem;
-      display: flex; align-items: center; gap: 1rem;
-      transition: border-color .2s;
-    }
-    .role-card:hover { border-color: var(--accent); }
-    .role-card.primary { border-color: var(--accent2); background: rgba(0,212,170,.06); }
-    .role-pct {
-      font-size: 1.3rem; font-weight: 700; min-width: 54px; text-align: center;
-    }
-    .role-info { flex: 1; }
-    .role-info strong { font-size: .95rem; }
-    .role-info p { font-size: .78rem; color: var(--sub); margin-top: .15rem; }
-    .role-bar { height: 5px; border-radius: 3px; margin-top: .4rem; }
-    .role-nth { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; }
-    .nth-tag {
-      font-size: .68rem; background: rgba(0,212,170,.1); border: 1px solid rgba(0,212,170,.25);
-      color: var(--accent2); border-radius: 12px; padding: .15rem .45rem;
-    }
-
-    /* ── Roadmap ── */
-    .phase-block { margin-bottom: 1.5rem; }
-    .phase-title {
-      font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-      padding: .35rem .8rem; border-radius: 6px; display: inline-block; margin-bottom: .8rem;
-    }
-    .phase-short  { background: rgba(105,240,174,.12); color: var(--success); }
-    .phase-medium { background: rgba(255,213,79,.1);    color: var(--warn); }
-    .phase-long   { background: rgba(255,107,107,.12); color: var(--danger); }
-
-    .roadmap-item {
-      background: #12141f;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-bottom: .65rem;
-    }
-    .roadmap-item .ri-header { display: flex; justify-content: space-between; align-items: center; }
-    .roadmap-item .ri-skill { font-size: .95rem; font-weight: 600; }
-    .ri-meta { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin-top: .5rem; }
-    .ri-meta span { font-size: .72rem; color: var(--sub); }
-    .ri-links { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
-    .ri-link {
-      font-size: .72rem; text-decoration: none;
-      background: rgba(108,99,255,.12); border: 1px solid rgba(108,99,255,.25);
-      color: var(--sub); border-radius: 6px; padding: .2rem .5rem;
-      transition: color .15s, border-color .15s;
-    }
-    .ri-link:hover { color: var(--accent); border-color: var(--accent); }
-    .ri-projects { margin-top: .5rem; font-size: .77rem; color: var(--sub); }
-    .ri-projects em { color: var(--accent2); font-style: normal; }
-
-    /* ── Pipeline log ── */
-    .log-row { display: flex; align-items: center; gap: .6rem; font-size: .8rem; color: var(--sub); margin-bottom: .3rem; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .dot-ok  { background: var(--success); }
-    .dot-err { background: var(--danger); }
-    .dot-skip{ background: var(--border); }
-
-    /* ── LeetCode stats ── */
-    .lc-bars { display: flex; gap: .5rem; margin-top: .6rem; }
-    .lc-bar { flex: 1; text-align: center; }
-    .lc-bar .count { font-size: 1.3rem; font-weight: 700; }
-    .lc-bar .diff { font-size: .7rem; margin-top: .15rem; }
-    .easy-c   { color: var(--success); }
-    .medium-c { color: var(--warn); }
-    .hard-c   { color: var(--danger); }
-
-    /* misc */
-    .section-gap { margin-top: 1.5rem; }
-    .pill {
-      display: inline-block; font-size: .72rem; border-radius: 20px; padding: .2rem .6rem;
-      background: rgba(108,99,255,.15); border: 1px solid rgba(108,99,255,.3); color: var(--accent);
-    }
-    .auth-pct { font-size: 2rem; font-weight: 700; color: var(--accent); text-align: center; margin: .3rem 0; }
-    .auth-sub { text-align: center; font-size: .8rem; color: var(--sub); }
+    body { background-color: #0f1117; }
+    .bar-fill  { transition: width 1s cubic-bezier(.4,0,.2,1); }
+    .ring-fill { transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1); }
   </style>
 </head>
-<body>
+<body class="text-slate-200 font-sans antialiased min-h-screen">
 
-<header>
-  <div class="logo-row">
-    <div class="logo">🎯</div>
-    <h1>PlacementIQ — Analysis Report</h1>
+  <!-- Header -->
+  <header class="bg-[#12141f] border-b border-[#2c3050] sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6c63ff] to-[#00d4aa]
+                    flex items-center justify-center text-lg select-none">&#127919;</div>
+        <span class="font-semibold text-lg tracking-tight">PlacementIQ</span>
+        <span class="hidden sm:inline text-slate-500 text-sm">/ Analysis Report</span>
+      </div>
+      <a href="/" class="text-slate-400 hover:text-[#00d4aa] text-sm transition-colors">
+        &#8592; New Analysis
+      </a>
+    </div>
+  </header>
+
+  <!-- Input echo bar -->
+  {% if result.meta is defined %}
+  <div class="bg-[#1a1d2e] border-b border-[#2c3050] text-[11px] text-slate-400">
+    <div class="max-w-6xl mx-auto px-5 py-2 flex flex-wrap gap-x-5 gap-y-1 items-center">
+      <span>&#128196; <span class="text-slate-300">{{ result.meta.resume_filename }}</span></span>
+      {% if result.meta.github_user %}
+      <span>&#128025; GitHub: <span class="text-slate-300">{{ result.meta.github_user }}</span></span>
+      {% else %}
+      <span class="text-slate-600">&#128025; GitHub: not provided</span>
+      {% endif %}
+      {% if result.meta.leetcode_user %}
+      <span>&#128187; LeetCode: <span class="text-slate-300">{{ result.meta.leetcode_user }}</span></span>
+      {% else %}
+      <span class="text-slate-600">&#128187; LeetCode: not provided</span>
+      {% endif %}
+      {% if result.meta.cgpa is not none %}
+      <span>&#127891; CGPA: <span class="text-slate-300">{{ result.meta.cgpa }}</span></span>
+      {% else %}
+      <span class="text-slate-600">&#127891; CGPA: not provided</span>
+      {% endif %}
+    </div>
   </div>
-  <a href="/">← New Analysis</a>
-</header>
+  {% endif %}
 
-<!-- ─────────────────────────── shorthand variables ────────────────────────── -->
-{% set skills   = result.skills %}
-{% set role     = result.role %}
-{% set roadmap  = result.roadmap %}
-{% set lc       = result.leetcode %}
-{% set gh       = result.github %}
-{% set readiness= role.readiness %}
-{% set grade    = readiness.grade %}
-{% set score    = readiness.readiness_score %}
-{% set gaps     = role.skill_gaps %}
-{% set auth     = skills.authenticity %}
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-10">
 
-<div class="container">
-
-  <!-- ═══════════════ ROW 1: Readiness + Authenticity + LeetCode ════════════ -->
-  <div class="grid-3">
-
-    <!-- Readiness Ring -->
-    <div class="card score-hero">
-      <p class="card-title">Readiness Score</p>
-      {% set circ = 3.14159 * 2 * 54 %}
-      {% set offset = circ * (1 - score / 100) %}
-      <div class="ring-wrap">
-        <svg width="130" height="130" viewBox="0 0 130 130">
-          <circle class="ring-bg"   cx="65" cy="65" r="54"/>
-          <circle class="ring-fill ring-{{ grade }}"
-                  cx="65" cy="65" r="54"
-                  stroke-dasharray="{{ circ }}"
-                  stroke-dashoffset="{{ offset }}"/>
-        </svg>
-        <div class="ring-text">
-          <span class="ring-score grade-{{ grade }}">{{ score | round(1) }}</span>
-          <span class="ring-grade">Grade {{ grade }}</span>
-        </div>
-      </div>
-      <p class="score-label">Role: <strong>{{ readiness.role }}</strong></p>
-
-      <hr class="divider" />
-      <div class="prog-row">
-        <span class="prog-label">Skill Match</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ readiness.components.skill_match / 50 * 100 }}%; background:var(--accent)"></div></div>
-        <span class="prog-val">{{ readiness.components.skill_match }}</span>
-      </div>
-      <div class="prog-row">
-        <span class="prog-label">Authenticity</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ readiness.components.authenticity / 20 * 100 }}%; background:var(--accent2)"></div></div>
-        <span class="prog-val">{{ readiness.components.authenticity }}</span>
-      </div>
-      <div class="prog-row">
-        <span class="prog-label">DSA / LeetCode</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ readiness.components.dsa_leetcode / 20 * 100 }}%; background:var(--warn)"></div></div>
-        <span class="prog-val">{{ readiness.components.dsa_leetcode }}</span>
-      </div>
-      <div class="prog-row">
-        <span class="prog-label">CGPA</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ readiness.components.cgpa / 10 * 100 }}%; background:var(--orange)"></div></div>
-        <span class="prog-val">{{ readiness.components.cgpa }}</span>
-      </div>
-    </div>
-
-    <!-- Authenticity -->
-    <div class="card">
-      <p class="card-title">Skill Authenticity</p>
-      <div class="auth-pct">{{ (auth.aggregate * 100) | round(1) }}%</div>
-      <div class="auth-sub">Aggregate verification score</div>
-      <hr class="divider" />
-      <div class="stat-row">
-        <div class="stat">
-          <div class="val">{{ auth.breakdown.total }}</div>
-          <div class="lbl">Total Skills</div>
-        </div>
-        <div class="stat">
-          <div class="val" style="color:var(--accent)">{{ skills.resume_skills | length }}</div>
-          <div class="lbl">Resume</div>
-        </div>
-        <div class="stat">
-          <div class="val" style="color:var(--accent2)">{{ skills.github_skills | length }}</div>
-          <div class="lbl">GitHub</div>
-        </div>
-        <div class="stat">
-          <div class="val" style="color:var(--orange)">{{ skills.leetcode_skills | length }}</div>
-          <div class="lbl">LeetCode</div>
-        </div>
-      </div>
-      <hr class="divider" />
-      <div class="prog-row">
-        <span class="prog-label">Verified by GitHub</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ auth.breakdown.verified_github / [auth.breakdown.total,1]|max * 100 }}%; background:var(--accent2)"></div></div>
-        <span class="prog-val">{{ auth.breakdown.verified_github }}</span>
-      </div>
-      <div class="prog-row">
-        <span class="prog-label">Verified LeetCode</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ auth.breakdown.verified_leetcode / [auth.breakdown.total,1]|max * 100 }}%; background:var(--orange)"></div></div>
-        <span class="prog-val">{{ auth.breakdown.verified_leetcode }}</span>
-      </div>
-      <div class="prog-row">
-        <span class="prog-label">Coverage</span>
-        <div class="prog-bar"><div class="prog-fill" style="width:{{ (auth.breakdown.verification_coverage * 100) }}%; background:var(--success)"></div></div>
-        <span class="prog-val">{{ (auth.breakdown.verification_coverage * 100) | round(0) }}%</span>
-      </div>
-    </div>
-
-    <!-- LeetCode -->
-    <div class="card">
-      <p class="card-title">LeetCode Activity</p>
-      {% if lc and lc.success %}
-        <div class="lc-bars">
-          <div class="lc-bar easy-c">
-            <div class="count">{{ lc.solved_easy }}</div>
-            <div class="diff">Easy</div>
-          </div>
-          <div class="lc-bar medium-c">
-            <div class="count">{{ lc.solved_medium }}</div>
-            <div class="diff">Medium</div>
-          </div>
-          <div class="lc-bar hard-c">
-            <div class="count">{{ lc.solved_hard }}</div>
-            <div class="diff">Hard</div>
-          </div>
-        </div>
-        <hr class="divider" />
-        <div style="display:flex;justify-content:space-between;font-size:.82rem">
-          <span style="color:var(--sub)">Total Solved</span>
-          <strong>{{ lc.solved_total }}</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-top:.4rem">
-          <span style="color:var(--sub)">Proficiency</span>
-          <strong style="text-transform:capitalize">{{ lc.proficiency }}</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-top:.4rem">
-          <span style="color:var(--sub)">Activity Score</span>
-          <strong>{{ (lc.activity_score * 100) | round(1) }}%</strong>
-        </div>
-        {% if lc.dsa_skills %}
-        <hr class="divider" />
-        <p style="font-size:.75rem;color:var(--sub);margin-bottom:.5rem">Inferred DSA Topics</p>
-        <div class="chip-area">
-          {% for s in lc.dsa_skills %}
-            <span class="chip chip-leetcode">{{ s }}</span>
-          {% endfor %}
-        </div>
-        {% endif %}
-      {% else %}
-        <p style="color:var(--sub);font-size:.85rem;margin-top:.5rem">
-          {% if lc.error %}{{ lc.error }}{% else %}No LeetCode username provided.{% endif %}
-        </p>
-      {% endif %}
-
-      {% if gh and gh.success %}
-      <hr class="divider" />
-      <p class="card-title" style="margin-bottom:.5rem">GitHub Summary</p>
-      <div style="display:flex;justify-content:space-between;font-size:.82rem">
-        <span style="color:var(--sub)">Repos</span><strong>{{ gh.repo_count }}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-top:.4rem">
-        <span style="color:var(--sub)">Stars</span><strong>{{ gh.total_stars }}</strong>
-      </div>
-      {% if gh.top_languages %}
-      <div style="margin-top:.6rem">
-        <p style="font-size:.72rem;color:var(--sub);margin-bottom:.35rem">Top Languages</p>
-        <div class="chip-area">
-          {% for l in gh.top_languages %}
-            <span class="chip chip-github">{{ l }}</span>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-      {% endif %}
-    </div>
-  </div><!-- /grid-3 -->
-
-  <!-- ═══════════════ ROW 2: Role Recommendations ══════════════════════════ -->
-  <div class="section-gap">
-    <div class="card">
-      <p class="card-title">🏆 Role Recommendations</p>
-      {% for rec in role.recommended_roles %}
-        <div class="role-card {% if rec.role == role.primary_role %}primary{% endif %}">
-          <div class="role-pct
-            {% if rec.match_pct >= 70 %}grade-A
-            {% elif rec.match_pct >= 55 %}grade-B
-            {% elif rec.match_pct >= 40 %}grade-C
-            {% elif rec.match_pct >= 25 %}grade-D
-            {% else %}grade-F{% endif %}">
-            {{ rec.match_pct | round(0) | int }}%
-          </div>
-          <div class="role-info">
-            <strong>{{ rec.role }}</strong>
-            {% if rec.role == role.primary_role %}<span class="pill" style="margin-left:.4rem">Primary</span>{% endif %}
-            <p>{{ rec.description[:90] }}{% if rec.description|length > 90 %}…{% endif %}</p>
-            <div class="role-bar" style="width:{{ rec.match_pct }}%; background:
-              {% if rec.match_pct >= 70 %}var(--success)
-              {% elif rec.match_pct >= 55 %}var(--accent2)
-              {% elif rec.match_pct >= 40 %}var(--warn)
-              {% else %}var(--danger){% endif %}">
-            </div>
-            <div style="font-size:.72rem;color:var(--sub);margin-top:.3rem">
-              {{ rec.matched_count }} / {{ rec.total_required }} required skills matched
-            </div>
-            {% if rec.nice_to_have_present %}
-            <div class="role-nth">
-              {% for s in rec.nice_to_have_present[:6] %}
-                <span class="nth-tag">+{{ s }}</span>
-              {% endfor %}
-            </div>
-            {% endif %}
-          </div>
-        </div>
-      {% else %}
-        <p style="color:var(--sub)">No roles matched.</p>
+    <!-- Warnings banner -->
+    {% if result.warnings %}
+    <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 space-y-1.5">
+      <p class="text-[10px] font-semibold uppercase tracking-widest text-yellow-400 mb-2">
+        &#9888; Notices — partial data used
+      </p>
+      {% for w in result.warnings %}
+      <p class="text-xs text-yellow-200/80 flex items-start gap-2">
+        <span class="mt-0.5 shrink-0 text-yellow-400">&#8250;</span>{{ w }}
+      </p>
       {% endfor %}
     </div>
-  </div>
+    {% endif %}
 
-  <!-- ═══════════════ ROW 3: Skills + Gaps ═════════════════════════════════ -->
-  <div class="section-gap grid-2">
+    <!-- 01 Candidate Skills -->
+    <section>
+      <h2 class="text-[10px] font-semibold uppercase tracking-widest text-[#00d4aa] mb-4">
+        01 &nbsp; Candidate Skills
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-    <!-- Candidate Skills -->
-    <div class="card">
-      <p class="card-title">🛠️ Your Skills ({{ skills.candidate_skills | length }})</p>
-      <div class="chip-area">
-        {% for skill in skills.candidate_skills %}
-          {% set srcs = skills.skill_sources.get(skill, []) %}
-          {% if 'github' in srcs and 'resume' in srcs %}
-            <span class="chip chip-verified" title="Resume + GitHub verified">{{ skill }}</span>
-          {% elif 'leetcode' in srcs and 'resume' in srcs %}
-            <span class="chip chip-verified" title="Resume + LeetCode verified">{{ skill }}</span>
-          {% elif 'github' in srcs %}
-            <span class="chip chip-github" title="GitHub only">{{ skill }}</span>
-          {% elif 'leetcode' in srcs %}
-            <span class="chip chip-leetcode" title="LeetCode only">{{ skill }}</span>
+        <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-5">
+          <p class="text-[10px] uppercase tracking-widest font-semibold text-[#00d4aa] mb-3">Resume Skills</p>
+          {% set rs = result.resume_skills %}
+          {% if rs %}
+          <div class="flex flex-wrap gap-2">
+            {% for skill in rs %}
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium
+                         bg-[#6c63ff]/15 text-[#a09af7] border border-[#6c63ff]/30">{{ skill }}</span>
+            {% endfor %}
+          </div>
           {% else %}
-            <span class="chip chip-resume" title="Resume only">{{ skill }}</span>
+          <p class="text-slate-500 text-sm">No skills extracted from resume.</p>
           {% endif %}
-        {% else %}
-          <p style="color:var(--sub);font-size:.85rem">No skills extracted.</p>
-        {% endfor %}
-      </div>
-      <hr class="divider" />
-      <div style="display:flex;gap:.5rem;font-size:.72rem;color:var(--sub)">
-        <span class="chip chip-verified">✓ Verified</span>
-        <span class="chip chip-resume">Resume only</span>
-        <span class="chip chip-github">GitHub</span>
-        <span class="chip chip-leetcode">LeetCode</span>
-      </div>
-    </div>
+        </div>
 
-    <!-- Skill Gaps -->
-    <div class="card">
-      <p class="card-title">🔍 Skill Gaps for {{ gaps.role }}</p>
-      {% if gaps.missing_skills %}
-        <p style="font-size:.8rem;color:var(--sub);margin-bottom:.8rem">
-          {{ gaps.gap_count }} gaps · {{ gaps.coverage_pct }}% role coverage
+        <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-5">
+          <p class="text-[10px] uppercase tracking-widest font-semibold text-[#00d4aa] mb-3">GitHub Verified Skills</p>
+          {% set gs = result.github_skills %}
+          {% if gs %}
+          <div class="flex flex-wrap gap-2">
+            {% for skill in gs %}
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium
+                         bg-[#00d4aa]/10 text-[#00d4aa] border border-[#00d4aa]/25">{{ skill }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-slate-500 text-sm">No GitHub skills found.</p>
+          {% endif %}
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 02 Coding Activity -->
+    <section>
+      <h2 class="text-[10px] font-semibold uppercase tracking-widest text-[#00d4aa] mb-4">
+        02 &nbsp; Coding Activity
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- GitHub Repos -->
+        <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-6 flex flex-col gap-2">
+          <p class="text-[10px] uppercase tracking-widest font-semibold text-[#00d4aa]">GitHub Repositories</p>
+          <p class="text-5xl font-bold text-white">{{ result.repo_count }}</p>
+          <p class="text-slate-400 text-sm">Public repos found</p>
+        </div>
+
+        <!-- LeetCode -->
+        {% set lc = result.leetcode_stats %}
+        <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-6 flex flex-col gap-4">
+          <div>
+            <p class="text-[10px] uppercase tracking-widest font-semibold text-[#00d4aa]">LeetCode Solved</p>
+            <p class="text-5xl font-bold text-white mt-1">{{ lc.total }}</p>
+          </div>
+          <div class="space-y-2.5">
+            {% for label, count, bar_cls, txt_cls in [
+              ("Easy",   lc.easy,   "bg-green-400",  "text-green-400"),
+              ("Medium", lc.medium, "bg-yellow-400", "text-yellow-400"),
+              ("Hard",   lc.hard,   "bg-red-400",    "text-red-400")
+            ] %}
+            {% set pct = ((count / lc.total * 100) if lc.total else 0) | round | int %}
+            <div class="flex items-center gap-3 text-xs">
+              <span class="w-14 font-medium {{ txt_cls }}">{{ label }}</span>
+              <div class="flex-1 h-2 bg-[#2c3050] rounded-full overflow-hidden">
+                <div class="bar-fill h-full {{ bar_cls }} rounded-full" style="width:0"
+                     data-pct="{{ pct }}"></div>
+              </div>
+              <span class="w-7 text-right text-slate-400">{{ count }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 03 Scores -->
+    <section>
+      <h2 class="text-[10px] font-semibold uppercase tracking-widest text-[#00d4aa] mb-4">
+        03 &nbsp; Scores
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        {% for label, pct, desc, colour in [
+          ("Authenticity", (result.authenticity * 100) | round | int, "Resume vs GitHub overlap",   "#6c63ff"),
+          ("Role Match",   (result.match * 100)        | round | int, "Skills matching target role", "#00d4aa"),
+          ("Readiness",    result.readiness             | round | int, "Overall placement readiness", "#f59e0b")
+        ] %}
+        <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-6 flex flex-col items-center gap-4">
+          <p class="text-[10px] uppercase tracking-widest font-semibold text-slate-400">{{ label }}</p>
+
+          <div class="relative w-28 h-28">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#2c3050" stroke-width="10"/>
+              <circle cx="50" cy="50" r="40" fill="none"
+                      stroke="{{ colour }}"
+                      stroke-width="10" stroke-linecap="round"
+                      stroke-dasharray="251.2"
+                      stroke-dashoffset="251.2"
+                      class="ring-fill"
+                      data-offset="{{ (251.2 * (1 - pct / 100)) | round(1) }}"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-2xl font-bold" style="color:{{ colour }}">{{ pct }}%</span>
+            </div>
+          </div>
+
+          <div class="w-full">
+            <div class="h-2 bg-[#2c3050] rounded-full overflow-hidden">
+              <div class="bar-fill h-full rounded-full" style="width:0;background:{{ colour }}"
+                   data-pct="{{ pct }}"></div>
+            </div>
+          </div>
+
+          <p class="text-slate-400 text-xs text-center">{{ desc }}</p>
+        </div>
+        {% endfor %}
+
+      </div>
+    </section>
+
+    <!-- 04 Recommended Role -->
+    <section>
+      <h2 class="text-[10px] font-semibold uppercase tracking-widest text-[#00d4aa] mb-4">
+        04 &nbsp; Recommended Role
+      </h2>
+      <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-6
+                  flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6c63ff] to-[#00d4aa]
+                    flex items-center justify-center text-2xl shrink-0">&#127775;</div>
+        <div class="flex-1">
+          <p class="text-2xl font-bold text-white">{{ result.role }}</p>
+          <p class="text-slate-400 text-sm mt-1">Best-fit role based on your verified skill profile.</p>
+        </div>
+        <div class="shrink-0 sm:text-right">
+          <span class="text-3xl font-bold text-[#00d4aa]">{{ (result.match * 100) | round | int }}%</span>
+          <p class="text-slate-400 text-xs mt-0.5">Match score</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Skill Gaps -->
+    <section>
+      <h2 class="text-[10px] font-semibold uppercase tracking-widest text-[#00d4aa] mb-4">
+        05 &nbsp; Skill Gaps
+      </h2>
+      <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-5">
+        {% set gaps = result.gaps %}
+        {% if gaps %}
+        <p class="text-slate-400 text-xs mb-4">
+          {{ gaps | length }} skill{{ 's' if gaps | length != 1 else '' }} to close for
+          <span class="text-white font-medium">{{ result.role }}</span>
         </p>
-        <div class="chip-area">
-          {% for item in gaps.missing_skills %}
-            {% if item.label == 'Critical' %}
-              <span class="chip chip-gap-crit" title="Critical">{{ item.skill }}</span>
-            {% elif item.label == 'Important' %}
-              <span class="chip chip-gap-imp" title="Important">{{ item.skill }}</span>
-            {% else %}
-              <span class="chip chip-gap-rec" title="Recommended">{{ item.skill }}</span>
-            {% endif %}
+        <div class="flex flex-wrap gap-2">
+          {% for gap in gaps %}
+          <span class="px-3 py-1.5 rounded-full text-xs font-medium
+                       bg-red-500/10 text-red-400 border border-red-500/25">
+            &#10005; {{ gap }}
+          </span>
           {% endfor %}
         </div>
-        <hr class="divider" />
-        <div style="display:flex;gap:.5rem;font-size:.72rem;color:var(--sub)">
-          <span class="chip chip-gap-crit">Critical</span>
-          <span class="chip chip-gap-imp">Important</span>
-          <span class="chip chip-gap-rec">Recommended</span>
-        </div>
-        {% if gaps.nice_to_have_gaps %}
-        <hr class="divider" />
-        <p style="font-size:.75rem;color:var(--sub);margin-bottom:.5rem">Nice to have</p>
-        <div class="chip-area">
-          {% for s in gaps.nice_to_have_gaps %}
-            <span class="chip chip-gap-rec">{{ s }}</span>
-          {% endfor %}
+        {% else %}
+        <div class="flex items-center gap-3 text-green-400">
+          <span class="text-2xl font-bold">&#10003;</span>
+          <p class="font-medium">No skill gaps detected &#8212; you already meet all requirements!</p>
         </div>
         {% endif %}
-      {% else %}
-        <p style="color:var(--success);font-size:.9rem;margin-top:.5rem">
-          🎉 No significant skill gaps detected for this role!
-        </p>
-      {% endif %}
-    </div>
-  </div>
+      </div>
+    </section>
 
-  <!-- ═══════════════ ROW 4: Roadmap ═══════════════════════════════════════ -->
-  <div class="section-gap">
-    <div class="card">
-      <p class="card-title">🗺️ Personalised Learning Roadmap</p>
-      <p style="color:var(--sub);font-size:.85rem;margin-bottom:1rem">{{ roadmap.summary }}</p>
-
-      {% for phase_key, phase_label_css in [('short-term','short'),('medium-term','medium'),('long-term','long')] %}
-        {% set items = roadmap.phases[phase_key] %}
-        {% if items %}
-        <div class="phase-block">
-          <span class="phase-title phase-{{ phase_label_css }}">
-            {% if phase_key == 'short-term' %}⚡ Short-term
-            {% elif phase_key == 'medium-term' %}📅 Medium-term
-            {% else %}🏗️ Long-term{% endif %}
-          </span>
-          {% for item in items %}
-          <div class="roadmap-item">
-            <div class="ri-header">
-              <span class="ri-skill">{{ item.skill }}</span>
-              <span class="pill">~{{ item.hours }}h</span>
-            </div>
-            <div class="ri-meta">
-              <span>Priority: <strong>{{ item.priority }}</strong></span>
-              <span>·</span>
-              <span>{{ item.phase_label }}</span>
-            </div>
-            {% if item.resources %}
-            <div class="ri-links">
-              {% for r in item.resources %}
-                <a class="ri-link" href="{{ r.url }}" target="_blank" rel="noopener">
-                  {% if r.type == 'course' %}📚
-                  {% elif r.type == 'docs' %}📄
-                  {% elif r.type == 'practice' %}🎮
-                  {% else %}🔗{% endif %}
-                  {{ r.name }}
-                </a>
+    <!-- 06 Roadmap -->
+    <section>
+      <h2 class="text-[10px] font-semibold uppercase tracking-widest text-[#00d4aa] mb-4">
+        06 &nbsp; Learning Roadmap
+      </h2>
+      {% set roadmap = result.roadmap %}
+      {% if roadmap %}
+      <div class="space-y-3">
+        {% for step in roadmap %}
+        <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-4
+                    flex items-start gap-4 hover:border-[#6c63ff]/50 transition-colors">
+          <div class="shrink-0 w-8 h-8 rounded-full bg-[#6c63ff]/20 border border-[#6c63ff]/40
+                      flex items-center justify-center text-xs font-bold text-[#a09af7]">
+            {{ loop.index }}
+          </div>
+          <div class="flex-1 min-w-0">
+            {% set parts = step.split(' | ') %}
+            {% if parts | length >= 2 %}
+              <p class="text-sm font-medium text-slate-200 break-words">{{ parts[0] }}</p>
+              {% for extra in parts[1:] %}
+              <p class="text-xs text-slate-400 mt-1 break-words">{{ extra }}</p>
               {% endfor %}
-            </div>
-            {% endif %}
-            {% if item.projects %}
-            <div class="ri-projects">
-              💡 Projects:
-              {% for p in item.projects %}
-                <em>{{ p }}</em>{% if not loop.last %} · {% endif %}
-              {% endfor %}
-            </div>
+            {% else %}
+              <p class="text-sm text-slate-200 break-words">{{ step }}</p>
             {% endif %}
           </div>
-          {% endfor %}
         </div>
-        {% endif %}
-      {% endfor %}
-
-      {% if roadmap.nice_to_have %}
-      <hr class="divider" />
-      <p style="font-size:.75rem;color:var(--sub);margin-bottom:.6rem">⭐ Nice-to-Have Learning</p>
-      <div class="chip-area">
-        {% for item in roadmap.nice_to_have %}
-          <span class="chip" style="background:rgba(159,168,218,.08);border-color:rgba(159,168,218,.25);color:var(--sub)">
-            {{ item.skill }} ~{{ item.hours }}h
-          </span>
         {% endfor %}
       </div>
+      {% else %}
+      <div class="bg-[#1e2235] border border-[#2c3050] rounded-2xl p-6 text-slate-400 text-sm text-center">
+        No roadmap items &#8212; your skill set already covers this role.
+      </div>
       {% endif %}
-    </div>
-  </div>
+    </section>
 
-  <!-- ═══════════════ ROW 5: Pipeline log ════════════════════════════════════ -->
-  <div class="section-gap">
-    <div class="card">
-      <p class="card-title">⚙️ Pipeline Log</p>
-      {% for log in result.pipeline_log %}
-        <div class="log-row">
-          <div class="dot {% if log.success %}dot-ok{% elif log.detail == 'No username provided' %}dot-skip{% else %}dot-err{% endif %}"></div>
-          <strong>{{ log.step }}</strong>
-          <span>—</span>
-          <span>
-            {% if log.success %}OK
-            {% elif log.detail %}{{ log.detail }}
-            {% else %}Skipped{% endif %}
-          </span>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
+    <!-- Footer -->
+    <footer class="text-center text-slate-600 text-xs py-4 border-t border-[#2c3050] mt-4">
+      PlacementIQ &#8212; AI-driven placement analysis
+      {% if result.warnings | length > 0 %}
+      &bull; <span class="text-yellow-500/60">{{ result.warnings | length }} notice(s)</span>
+      {% endif %}
+      &bull; <a href="/" class="text-[#6c63ff] hover:text-[#00d4aa] transition-colors">Run another analysis &rarr;</a>
+    </footer>
 
-</div><!-- /container -->
+  </main>
 
-<footer style="text-align:center;color:var(--sub);font-size:.75rem;padding:2rem 0">
-  PlacementIQ · Report generated · <a href="/" style="color:var(--accent);text-decoration:none">Run another analysis →</a>
-</footer>
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        document.querySelectorAll('.bar-fill[data-pct]').forEach(function (el) {
+          el.style.width = el.dataset.pct + '%';
+        });
+        document.querySelectorAll('.ring-fill[data-offset]').forEach(function (el) {
+          el.style.strokeDashoffset = el.dataset.offset;
+        });
+      }, 100);
+    });
+  </script>
 
 </body>
 </html>

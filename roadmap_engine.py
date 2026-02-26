@@ -13,7 +13,9 @@ The roadmap respects skill dependency ordering and the candidate's
 existing baseline so the plan is always incremental.
 """
 
+import json
 import logging
+import os
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -468,7 +470,7 @@ def _assign_phase(weight: int, estimated_hours: int) -> dict:
 #  Public API                                                                  #
 # --------------------------------------------------------------------------- #
 
-def generate_roadmap(
+def generate_roadmap_full(
     skill_gaps:       dict,
     candidate_skills: list,
     role_name:        str            = "",
@@ -577,3 +579,180 @@ def generate_roadmap(
         "nice_to_have": nth_items,
         "summary":     summary,
     }
+
+
+# --------------------------------------------------------------------------- #
+#  Roles data (for skill-weight lookup)                                       #
+# --------------------------------------------------------------------------- #
+
+_ROLES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "roles.json")
+try:
+    with open(_ROLES_PATH, "r", encoding="utf-8") as _fh:
+        _ROLES: dict = json.load(_fh)
+except Exception:
+    _ROLES: dict = {}
+
+
+# --------------------------------------------------------------------------- #
+#  Primary public function                                                     #
+# --------------------------------------------------------------------------- #
+
+def generate_roadmap(missing_skills: list, role: str) -> list:
+    """
+    Generate an ordered list of plain-text learning step strings.
+
+    Parameters
+    ----------
+    missing_skills : list[str]  Skills the candidate currently lacks.
+    role           : str        Target role name (included in each step for context).
+
+    Returns
+    -------
+    list[str]
+        Ordered learning steps.  Weight-3 (Critical) skills come first,
+        weight-2 (Important) second, unknown / weight-1 last.
+        Input duplicates are removed (case-insensitive).
+        Returns [] when missing_skills is empty.
+    """
+    if not missing_skills:
+        return []
+
+    # Deduplicate (case-insensitive), preserving first occurrence order
+    seen: set = set()
+    deduped: list = []
+    for s in missing_skills:
+        key = s.lower().strip()
+        if key and key not in seen:
+            seen.add(key)
+            deduped.append(key)
+
+    if not deduped:
+        return []
+
+    # Build weight map from roles.json for the target role
+    role_key = role.strip()
+    role_data: dict = _ROLES.get(role_key, {})
+    if not role_data:
+        # Case-insensitive fallback
+        role_lower = role_key.lower()
+        for k, v in _ROLES.items():
+            if k.lower() == role_lower:
+                role_data = v
+                break
+
+    weight_map: dict = {}
+    for group_skills in role_data.get("required_skills", {}).values():
+        if isinstance(group_skills, dict):
+            for skill, w in group_skills.items():
+                weight_map[skill.lower()] = int(w)
+
+    # Sort: highest weight first (stable sort preserves insertion order for ties)
+    sorted_skills = sorted(deduped, key=lambda s: -weight_map.get(s, 0))
+
+    role_label = role_key if role_key else "your target role"
+    steps: list = []
+
+    for skill in sorted_skills:
+        entry = _RESOURCES.get(skill)
+        if entry:
+            res_list = entry.get("resources", [])
+            projects = entry.get("projects", [])
+            hours    = entry.get("hours", 20)
+
+            if res_list:
+                first_res = res_list[0]
+                res_str = f"{first_res['name']} ({first_res['url']})"
+            else:
+                res_str = f"search 'learn {skill}'"
+
+            project_str = projects[0] if projects else f"build a {skill} demo project"
+
+            step = (
+                f"[{role_label}] Learn {skill} (~{hours}h): "
+                f"{res_str} | "
+                f"Project: {project_str}"
+            )
+        else:
+            step = (
+                f"[{role_label}] Study {skill}: "
+                f"search for 'learn {skill}' tutorials and build a demo project"
+            )
+
+        steps.append(step)
+
+    return steps
+
+
+# --------------------------------------------------------------------------- #
+#  Self-tests                                                                  #
+# --------------------------------------------------------------------------- #
+
+if __name__ == "__main__":
+    import sys
+
+    _PASS = 0
+    _FAIL = 0
+
+    def _check(label: str, condition: bool) -> None:
+        global _PASS, _FAIL
+        if condition:
+            print(f"  PASS  {label}")
+            _PASS += 1
+        else:
+            print(f"  FAIL  {label}")
+            _FAIL += 1
+
+    print("\n=== roadmap_engine.generate_roadmap tests ===\n")
+
+    # T01 – empty input returns empty list
+    r = generate_roadmap([], "Software Development Engineer")
+    _check("T01 empty missing_skills -> []", r == [])
+
+    # T02 – unknown skills produce fallback steps
+    r = generate_roadmap(["quantumcomputing", "telepathy"], "Backend Developer")
+    _check("T02 two unknown skills -> 2 steps", len(r) == 2)
+    _check("T03 fallback contains skill name", "quantumcomputing" in r[0].lower())
+    _check("T04 fallback has role label", "backend developer" in r[0].lower())
+    _check("T05 fallback step has tutorial wording", "tutorials" in r[0].lower())
+
+    # T06-T09 – known skills produce resource-backed steps
+    r = generate_roadmap(["python", "docker"], "Backend Developer")
+    _check("T06 two known skills -> 2 steps", len(r) == 2)
+    _check("T07 step contains hours estimate", "~" in r[0] and "h)" in r[0])
+    _check("T08 step contains https:// URL", "https://" in r[0])
+    _check("T09 step contains Project:", "Project:" in r[0])
+    _check("T10 role label in step", "backend developer" in r[0].lower())
+
+    # T11 – core skills before important skills
+    # In 'Software Development Engineer': algorithms=3 (core), python=2 (languages)
+    r = generate_roadmap(["python", "algorithms"], "Software Development Engineer")
+    _check(
+        "T11 weight-3 skill (algorithms) precedes weight-2 skill (python)",
+        len(r) == 2 and "algorithms" in r[0].lower()
+    )
+
+    # T12 – deduplication
+    r = generate_roadmap(["python", "Python", "PYTHON", "docker"], "Backend Developer")
+    _check("T12 duplicates removed -> 2 steps", len(r) == 2)
+
+    # T13 – empty role string uses fallback label
+    r = generate_roadmap(["python"], "")
+    _check("T13 empty role string no crash -> 1 step", len(r) == 1)
+    _check("T14 empty role uses fallback label", "your target role" in r[0].lower())
+
+    # T15 – unknown role still returns steps
+    r = generate_roadmap(["python", "docker"], "Wizard Engineer")
+    _check("T15 unknown role -> 2 steps returned", len(r) == 2)
+
+    # T16 – single skill list
+    r = generate_roadmap(["react"], "Frontend Developer")
+    _check("T16 single skill -> 1 step", len(r) == 1)
+    _check("T17 react step has resource", "https://" in r[0])
+
+    # T18 – list with only blank/whitespace entries
+    r = generate_roadmap(["  ", "", "  "], "Backend Developer")
+    _check("T18 all-blank entries -> []", r == [])
+
+    print(f"\n{'='*46}")
+    print(f"Results: {_PASS} passed, {_FAIL} failed")
+    sys.exit(0 if _FAIL == 0 else 1)
