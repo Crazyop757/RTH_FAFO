@@ -47,6 +47,7 @@ from application_engine import (
     get_applications_for_job,
     get_applications_for_student,
 )
+from chatbot_engine import get_bot_response
 
 # Minimum non-empty text length considered a valid extraction
 _MIN_RESUME_CHARS = 40
@@ -704,6 +705,25 @@ def health():
     return jsonify({"status": "ok", "service": "placement-analysis-backend"})
 
 
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    """
+    Chatbot endpoint for answering FAQs.
+    Expects JSON: {"message": "user question"}
+    Returns JSON: {"response": "bot answer"}
+    """
+    data = request.get_json()
+    if not data or "message" not in data:
+        return jsonify({"error": "Missing 'message' field"}), 400
+    
+    user_message = data.get("message", "").strip()
+    if not user_message:
+        return jsonify({"error": "Empty message"}), 400
+    
+    bot_response = get_bot_response(user_message)
+    return jsonify({"response": bot_response})
+
+
 # --------------------------------------------------------------------------- #
 #  Error handlers                                                              #
 # --------------------------------------------------------------------------- #
@@ -731,4 +751,4 @@ def server_error(e):
 if __name__ == "__main__":
     port  = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
-    app.run(host="0.0.0.0", port=port, debug=debug)
+    app.run(host="0.0.0.0", port=port, debug=True)

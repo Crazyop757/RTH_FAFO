@@ -20,5 +20,38 @@
     ],
     "created_by": "Rudra",
     "created_at": "2026-02-26T20:00:39.983602+00:00"
+  },
+  {
+    "id": "cb429ce5-80ae-4937-8d88-ba49e3983fab",
+    "title": "Deep Learning Engineer",
+    "company": "AIRA",
+    "description": "me tereko bhi nahi daal raha",
+    "required_skills": [
+      "python"
+    ],
+    "created_by": "Rudra",
+    "created_at": "2026-02-26T20:20:29.310656+00:00"
+  },
+  {
+    "id": "77860088-f433-4614-a88a-e6f23436f090",
+    "title": "data Engineer",
+    "company": "Shinde Corp",
+    "description": "me tereko bhi nahi lunga",
+    "required_skills": [
+      "python"
+    ],
+    "created_by": "Rudra",
+    "created_at": "2026-02-27T09:10:51.896159+00:00"
+  },
+  {
+    "id": "b6b1f9fa-e03f-4f6e-8465-29f1e141e3d9",
+    "title": "backend engineer",
+    "company": "AIRA",
+    "description": "",
+    "required_skills": [
+      "nodejs"
+    ],
+    "created_by": "jay",
+    "created_at": "2026-02-27T09:42:24.988017+00:00"
   }
 ]

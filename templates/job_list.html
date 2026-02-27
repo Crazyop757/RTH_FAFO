@@ -5,104 +5,107 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PlacementIQ &ndash; Browse Jobs</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Inter',sans-serif}
+    html{scroll-behavior:smooth}
+    body{background:#07080f}
+    .mesh{background:radial-gradient(ellipse 140% 90% at 15% -30%,rgba(99,102,241,.3) 0%,transparent 55%),radial-gradient(ellipse 80% 60% at 85% 5%,rgba(139,92,246,.2) 0%,transparent 50%),radial-gradient(ellipse 50% 40% at 50% 110%,rgba(16,185,129,.1) 0%,transparent 50%),#07080f}
+    .glass{background:rgba(255,255,255,.04);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.08)}
+    .gcard{background:rgba(255,255,255,.035);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.07);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+    .gcard:hover{transform:translateY(-5px);box-shadow:0 24px 48px rgba(99,102,241,.18);border-color:rgba(99,102,241,.4)}
+    .grad{background:linear-gradient(135deg,#a5b4fc 0%,#c4b5fd 50%,#6ee7b7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .pill{background:rgba(99,102,241,.14);border:1px solid rgba(99,102,241,.28)}
+    .pill-green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25)}
+    .pill-amber{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25)}
+    .pill-rose{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.25)}
+    .btn-g{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);box-shadow:0 0 35px rgba(99,102,241,.45),inset 0 1px 0 rgba(255,255,255,.18);transition:all .2s ease}
+    .btn-g:hover{box-shadow:0 0 55px rgba(99,102,241,.65),inset 0 1px 0 rgba(255,255,255,.25);transform:translateY(-1px)}
+    .btn-o{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);transition:all .2s ease}
+    .btn-o:hover{background:rgba(255,255,255,.1);border-color:rgba(99,102,241,.5);box-shadow:0 0 20px rgba(99,102,241,.15)}
+    .inp{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;transition:all .2s ease}
+    .inp::placeholder{color:rgba(255,255,255,.3)}
+    .inp:focus{outline:none;border-color:rgba(99,102,241,.7);box-shadow:0 0 0 3px rgba(99,102,241,.18);background:rgba(255,255,255,.09)}
+    .divline{background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);height:1px}
+    .tag{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+    .shead{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    @keyframes pglow{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+    @keyframes dash{from{stroke-dashoffset:339}}
+    .ring-a{animation:dash 1.1s ease-out forwards}
+    @keyframes grow{from{width:0}}
+    .bar-a{animation:grow 1s ease-out forwards}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spin{animation:spin .7s linear infinite}
+    .file-drop-active{border-color:#6366f1!important;background:rgba(99,102,241,.08)!important}
+    .nav-link{color:rgba(255,255,255,.55);transition:color .2s ease}
+    .nav-link:hover{color:#fff}
+    .nav-link.active{color:#a5b4fc;font-weight:600}
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
-
-  <!-- Navbar -->
-  <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-      <a href="/home" class="flex items-center gap-2 font-semibold text-gray-900">
-        <span class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">P</span>
-        PlacementIQ
-      </a>
-      <div class="flex items-center gap-5 text-sm">
-        <a href="/jobs" class="text-indigo-600 font-semibold">Browse Jobs</a>
-        <a href="/" class="text-gray-500 hover:text-indigo-600 transition-colors font-medium">Analysis</a>
-        {% if user %}
-        <span class="text-gray-400">{{ user }}</span>
-        {% endif %}
-        <a href="/logout" class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200">Logout</a>
+<body class="mesh text-white antialiased min-h-screen flex flex-col">
+  <nav class="glass sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/home" class="flex items-center gap-3"><div class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm text-white" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.55)">P</div><span class="font-bold text-white tracking-tight">PlacementIQ</span></a>
+      <div class="flex items-center gap-6">
+        <a href="/jobs" class="nav-link text-sm">Browse Jobs</a>
+        <a href="/" class="nav-link text-sm">Analysis</a>
+        {% if session.user %}<span class="tag text-white/50 text-xs px-3 py-1.5 rounded-xl">{{ session.user }}</span>{% endif %}
+        <a href="/logout" class="btn-o text-white/70 px-4 py-1.5 rounded-xl text-xs font-medium">Logout</a>
       </div>
     </div>
   </nav>
-
-  <!-- Flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
   <div class="max-w-5xl mx-auto w-full px-6 mt-5 space-y-2">
     {% for category, message in messages %}
-    <div class="rounded-lg px-4 py-3 text-sm
-      {% if category == 'error' %}bg-red-50 border border-red-200 text-red-700
-      {% elif category == 'success' %}bg-green-50 border border-green-200 text-green-700
-      {% else %}bg-blue-50 border border-blue-200 text-blue-700{% endif %}">
-      {{ message }}
-    </div>
+    <div class="rounded-xl px-4 py-3.5 text-sm {% if category=='error' %}bg-rose-500/15 border border-rose-500/30 text-rose-300{% elif category=='success' %}bg-emerald-500/15 border border-emerald-500/30 text-emerald-300{% else %}bg-indigo-500/15 border border-indigo-500/30 text-indigo-300{% endif %}">{{ message }}</div>
     {% endfor %}
   </div>
-  {% endif %}
-  {% endwith %}
-
+  {% endif %}{% endwith %}
   <main class="max-w-5xl mx-auto w-full px-6 py-10 flex-1">
-
-    <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <div class="mb-7 flex items-end justify-between gap-4 flex-wrap">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-800">Job Listings</h1>
-        <p class="text-gray-400 text-sm mt-0.5">
-          {% if has_profile %}Sorted by profile match.{% else %}Run an analysis first to see match scores.{% endif %}
-        </p>
+        <h1 class="text-2xl font-black text-white tracking-tight">Job Listings</h1>
+        <p class="text-white/40 text-sm mt-1">{% if has_profile %}Sorted by your profile match score.{% else %}Run an analysis first to see personalised match scores.{% endif %}</p>
       </div>
-      {% if not has_profile %}
-      <a href="/" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">Analyse Profile &rarr;</a>
-      {% endif %}
+      {% if not has_profile %}<a href="/" class="btn-g text-white px-5 py-2.5 rounded-xl text-sm font-bold">Analyse Profile &rarr;</a>{% endif %}
     </div>
 
     {% if jobs %}
     <div class="space-y-4">
       {% for job in jobs %}
       {% set my_skills = session.get('candidate_profile', {}).get('resume_skills', []) + session.get('candidate_profile', {}).get('github_skills', []) %}
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div class="gcard rounded-2xl p-6">
         <div class="flex items-start justify-between gap-4 flex-wrap">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 flex-wrap">
-              <h2 class="font-semibold text-gray-800">{{ job.title }}</h2>
-              <span class="text-gray-400 text-sm">&middot; {{ job.company }}</span>
-              {% if job._already_applied %}
-              <span class="bg-green-50 text-green-600 text-xs px-2 py-0.5 rounded-full font-medium">Applied</span>
-              {% endif %}
+              <h2 class="font-black text-white text-base">{{ job.title }}</h2>
+              <span class="text-white/40 text-sm">{{ job.company }}</span>
+              {% if job._already_applied %}<span class="pill-green text-emerald-300 text-xs px-3 py-1 rounded-full font-bold">&#10003; Applied</span>{% endif %}
             </div>
-            {% if job.description %}
-            <p class="text-gray-500 text-sm mt-2 line-clamp-2">{{ job.description }}</p>
-            {% endif %}
-            <!-- Skills -->
+            {% if job.description %}<p class="text-white/40 text-sm mt-2 line-clamp-2 leading-relaxed">{{ job.description }}</p>{% endif %}
             {% if job.required_skills %}
             <div class="flex flex-wrap gap-1.5 mt-3">
-              {% for skill in job.required_skills %}
-              {% set matched = skill | lower in (my_skills | map('lower') | list) %}
-              <span class="px-2.5 py-1 rounded-md text-xs font-medium
-                {% if matched %}bg-indigo-50 text-indigo-600{% else %}bg-gray-100 text-gray-500{% endif %}">
-                {{ skill }}{% if matched %} &#10003;{% endif %}
-              </span>
+              {% for skill in job.required_skills %}{% set matched = skill|lower in (my_skills|map('lower')|list) %}
+              <span class="px-2.5 py-1 rounded-lg text-xs font-medium {% if matched %}pill text-indigo-300{% else %}tag text-white/40{% endif %}">{{ skill }}{% if matched %} &#10003;{% endif %}</span>
               {% endfor %}
             </div>
             {% endif %}
-            <p class="text-gray-400 text-xs mt-3">Posted {{ job.created_at }}</p>
+            <p class="text-white/25 text-xs mt-3">Posted {{ job.created_at }}</p>
           </div>
           <div class="flex flex-col items-end gap-3 flex-shrink-0">
             {% if has_profile %}
             <div class="text-right">
-              <p class="text-xl font-bold text-indigo-600">{{ job._match_ratio | round(0) | int }}%</p>
-              <p class="text-xs text-gray-400">match</p>
+              <p class="text-4xl font-black leading-none" style="background:linear-gradient(135deg,#818cf8,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{{ job._match_ratio | round(0) | int }}%</p>
+              <p class="text-xs text-white/35 mt-1">match</p>
             </div>
-            <div class="w-24 bg-gray-200 rounded-full h-1.5">
-              <div class="bg-indigo-500 rounded-full h-1.5" style="width:{{ job._match_ratio | round(0) | int }}%"></div>
+            <div class="w-24 rounded-full h-1.5" style="background:rgba(255,255,255,.08)">
+              <div class="rounded-full h-1.5" style="width:{{ job._match_ratio | round(0) | int }}%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div>
             </div>
             {% endif %}
             {% if not job._already_applied %}
             <form method="POST" action="/jobs/apply/{{ job.id }}">
-              <button type="submit"
-                      class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors">
-                Apply
-              </button>
+              <button type="submit" class="btn-g text-white px-5 py-2 rounded-xl text-sm font-bold">Apply Now</button>
             </form>
             {% endif %}
           </div>
@@ -110,19 +113,137 @@
       </div>
       {% endfor %}
     </div>
-
     {% else %}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-16 text-center">
-      <p class="text-4xl mb-4">&#128269;</p>
-      <h3 class="font-semibold text-gray-700 mb-1">No jobs posted yet</h3>
-      <p class="text-gray-400 text-sm">Check back soon as recruiters post new openings.</p>
+    <div class="gcard rounded-2xl px-8 py-20 text-center">
+      <p class="text-5xl mb-5">&#128269;</p>
+      <h3 class="font-black text-white mb-2">No jobs posted yet</h3>
+      <p class="text-white/40 text-sm">Check back soon as recruiters post new openings.</p>
     </div>
     {% endif %}
-
   </main>
-
-  <footer class="bg-white border-t border-gray-100 py-5 mt-8">
-    <p class="text-center text-gray-400 text-xs">PlacementIQ &middot; AI Placement Platform</p>
+  <footer class="border-t mt-auto py-8 px-6" style="border-color:rgba(255,255,255,.06)">
+    <p class="text-center text-white/25 text-xs">PlacementIQ &middot; AI Placement Platform</p>
   </footer>
+
+  <!-- Chatbot Widget -->
+  <div id="chatBtn" class="fixed bottom-6 right-6 w-14 h-14 rounded-full btn-g flex items-center justify-center text-2xl cursor-pointer z-[9998] transition-transform hover:scale-110" style="animation:pglow 3s ease-in-out infinite" title="Ask me anything">💬</div>
+  
+  <div id="chatWindow" class="fixed bottom-24 right-6 w-96 max-w-[90vw] h-[500px] gcard rounded-3xl shadow-2xl z-[9999] flex-col hidden" style="box-shadow:0 25px 60px rgba(0,0,0,.5)">
+    <div class="flex items-center justify-between px-5 py-4 border-b" style="background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.2));border-color:rgba(255,255,255,.1);border-radius:1.5rem 1.5rem 0 0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">💬</div>
+        <div><p class="text-white font-bold text-sm">PlacementIQ Assistant</p><p class="text-white/40 text-xs">Ask me anything</p></div>
+      </div>
+      <button id="closeChat" class="text-white/60 hover:text-white text-xl leading-none transition-colors">&times;</button>
+    </div>
+    
+    <div id="chatMessages" class="flex-1 overflow-y-auto px-5 py-4 space-y-3" style="scrollbar-width:thin;scrollbar-color:rgba(99,102,241,.3) transparent"></div>
+    
+    <div id="typingIndicator" class="hidden px-5 pb-2"><div class="inline-block pill px-4 py-2 rounded-2xl"><div class="flex gap-1"><span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></span><span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay:.15s"></span><span class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay:.3s"></span></div></div></div>
+    
+    <div class="px-5 py-4 border-t" style="border-color:rgba(255,255,255,.08)">
+      <div class="flex gap-2">
+        <input id="chatInput" type="text" placeholder="Type your question..." class="inp flex-1 px-4 py-3 rounded-2xl text-sm" style="background:rgba(255,255,255,.08)"/>
+        <button id="sendBtn" class="btn-g px-5 rounded-2xl font-semibold text-sm">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const chatBtn=document.getElementById('chatBtn');
+  const chatWindow=document.getElementById('chatWindow');
+  const closeChat=document.getElementById('closeChat');
+  const chatMessages=document.getElementById('chatMessages');
+  const chatInput=document.getElementById('chatInput');
+  const sendBtn=document.getElementById('sendBtn');
+  const typingIndicator=document.getElementById('typingIndicator');
+  
+  function toggleChat(){
+    chatWindow.classList.toggle('hidden');
+    chatWindow.classList.toggle('flex');
+    if(!chatWindow.classList.contains('hidden')){
+      chatInput.focus();
+      if(chatMessages.children.length===0){
+        addBotMessage("Hi! I'm your PlacementIQ assistant. Ask me anything about the platform, authenticity scores, GitHub integration, or job matching!");
+      }
+    }
+  }
+  
+  chatBtn.addEventListener('click',toggleChat);
+  closeChat.addEventListener('click',toggleChat);
+  
+  function addUserMessage(msg){
+    const div=document.createElement('div');
+    div.className='flex justify-end';
+    div.innerHTML=`<div class="btn-g px-4 py-2.5 rounded-2xl max-w-[75%] text-sm text-white">${escapeHtml(msg)}</div>`;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop=chatMessages.scrollHeight;
+  }
+  
+  function addBotMessage(msg){
+    const wrap=document.createElement('div');
+    wrap.className='flex justify-start';
+    const bubble=document.createElement('div');
+    bubble.className='pill px-4 py-2.5 rounded-2xl max-w-[75%] text-sm text-white/90';
+    bubble.style.cssText='white-space:pre-wrap;word-break:break-word;min-height:1.4em';
+    wrap.appendChild(bubble);
+    chatMessages.appendChild(wrap);
+    chatMessages.scrollTop=chatMessages.scrollHeight;
+    const chars=[...msg];
+    let i=0;
+    const pause={'\n':60,'.':55,'!':55,'?':55,',':30};
+    (function type(){
+      if(i>=chars.length)return;
+      bubble.textContent+=chars[i];
+      chatMessages.scrollTop=chatMessages.scrollHeight;
+      setTimeout(type,pause[chars[i++]]??9);
+    })();
+  }
+  
+  function showTyping(){typingIndicator.classList.remove('hidden');}
+  function hideTyping(){typingIndicator.classList.add('hidden');}
+  
+  async function sendMessage(){
+    const msg=chatInput.value.trim();
+    if(!msg)return;
+    addUserMessage(msg);
+    chatInput.value='';
+    showTyping();
+    try{
+      const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});
+      
+      if(!res.ok){
+        hideTyping();
+        addBotMessage("Server error. Please make sure Flask is running!");
+        console.error('HTTP Error:',res.status,res.statusText);
+        return;
+      }
+      
+      const data=await res.json();
+      hideTyping();
+      
+      if(data.response){
+        addBotMessage(data.response);
+      }else if(data.error){
+        addBotMessage("Error: "+data.error);
+      }else{
+        addBotMessage("Sorry, I couldn't process that. Please try again!");
+      }
+    }catch(err){
+      hideTyping();
+      addBotMessage("Connection error! Make sure the server is running.");
+      console.error('Fetch error:',err);
+    }
+  }
+  
+  sendBtn.addEventListener('click',sendMessage);
+  chatInput.addEventListener('keypress',e=>{if(e.key==='Enter')sendMessage();});
+  
+  function escapeHtml(text){
+    const div=document.createElement('div');
+    div.textContent=text;
+    return div.innerHTML;
+  }
+  </script>
 </body>
 </html>

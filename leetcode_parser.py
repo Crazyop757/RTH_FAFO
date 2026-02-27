@@ -22,13 +22,48 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-_LC_GRAPHQL = "https://leetcode.com/graphql"
+_LC_GRAPHQL  = "https://leetcode.com/graphql"
+_LC_HOMEPAGE = "https://leetcode.com/"
 
-_HEADERS = {
+_BASE_HEADERS = {
     "Content-Type": "application/json",
+    "Origin":       "https://leetcode.com",
     "Referer":      "https://leetcode.com",
-    "User-Agent":   "Mozilla/5.0 (compatible; PlacementBot/1.0)",
+    "User-Agent":   (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/122.0.0.0 Safari/537.36"
+    ),
+    "Accept":        "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
 }
+
+# Module-level session — reused across calls so the CSRF token is fetched once.
+_session: requests.Session = None
+_session_failures: int = 0
+_MAX_SESSION_FAILURES = 3
+
+
+def _get_session() -> requests.Session:
+    """Return a live requests.Session with a valid LeetCode CSRF cookie."""
+    global _session, _session_failures
+    if _session is not None and _session_failures < _MAX_SESSION_FAILURES:
+        return _session
+    sess = requests.Session()
+    sess.headers.update(_BASE_HEADERS)
+    try:
+        sess.get(_LC_HOMEPAGE, timeout=10)
+        csrf = sess.cookies.get("csrftoken", "")
+        if csrf:
+            sess.headers.update({"x-csrftoken": csrf})
+            logger.debug("LeetCode CSRF token acquired (len=%d)", len(csrf))
+        else:
+            logger.warning("LeetCode homepage did not return a csrftoken cookie")
+    except Exception as exc:
+        logger.warning("Failed to fetch LeetCode homepage for CSRF: %s", exc)
+    _session = sess
+    _session_failures = 0
+    return _session
 
 # GraphQL query  matchedUser -> submitStatsGlobal -> acSubmissionNum
 _STATS_QUERY = """
@@ -82,25 +117,37 @@ _HARD_PROFICIENT   = 10
 #  Internal helpers                                                            #
 # --------------------------------------------------------------------------- #
 
-def _gql_post(query: str, variables: dict, timeout: int = 10) -> Optional[dict]:
-    """POST a GraphQL query; returns parsed JSON or None on any error."""
-    try:
-        resp = requests.post(
-            _LC_GRAPHQL,
-            json={"query": query, "variables": variables},
-            headers=_HEADERS,
-            timeout=timeout,
-        )
-        if resp.status_code == 200:
-            return resp.json()
-        logger.warning("LeetCode GraphQL returned HTTP %s", resp.status_code)
-        return None
-    except requests.Timeout:
-        logger.warning("LeetCode request timed out (variables=%s)", variables)
-        return None
-    except requests.RequestException as exc:
-        logger.warning("LeetCode request failed: %s", exc)
-        return None
+def _gql_post(query: str, variables: dict, timeout: int = 12) -> Optional[dict]:
+    """POST a GraphQL query using a CSRF-authenticated session.
+    
+    Automatically retries once with a fresh session if a 403/499 is received.
+    Returns parsed JSON or None on any error.
+    """
+    global _session_failures
+    for attempt in range(2):
+        sess = _get_session()
+        try:
+            resp = sess.post(
+                _LC_GRAPHQL,
+                json={"query": query, "variables": variables},
+                timeout=timeout,
+            )
+            if resp.status_code == 200:
+                return resp.json()
+            # 403/499 usually means CSRF expired — force session refresh on retry
+            logger.warning(
+                "LeetCode GraphQL HTTP %s (attempt %d/2)",
+                resp.status_code, attempt + 1,
+            )
+            _session_failures += 1
+            _session = None   # force re-creation on next attempt
+        except requests.Timeout:
+            logger.warning("LeetCode request timed out (variables=%s)", variables)
+            return None
+        except requests.RequestException as exc:
+            logger.warning("LeetCode request failed: %s", exc)
+            return None
+    return None
 
 
 def _parse_ac_counts(ac_list: list) -> tuple:
