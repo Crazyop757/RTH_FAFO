@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PlacementIQ &ndash; Post a Job</title>
+  <title>FindOut &ndash; Post a Job</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -46,7 +46,7 @@
 <body class="mesh text-white antialiased min-h-screen flex flex-col">
   <nav class="glass sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/home" class="flex items-center gap-3"><div class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm text-white" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.55)">P</div><span class="font-bold text-white tracking-tight">PlacementIQ</span></a>
+<a href="/home" class="flex items-center select-none"><span class="text-white font-extralight text-xl tracking-[0.2em] uppercase">Find</span><span class="text-white font-black text-xl tracking-tight uppercase">Out</span></a>
       <div class="flex items-center gap-6">
         <a href="/recruiter/jobs" class="nav-link text-sm">Dashboard</a>
         <a href="/recruiter/jobs/new" class="nav-link text-sm">Post Job</a>
@@ -95,7 +95,7 @@
     </form>
   </main>
   <footer class="border-t mt-auto py-8 px-6" style="border-color:rgba(255,255,255,.06)">
-    <p class="text-center text-white/25 text-xs">PlacementIQ &middot; AI Placement Platform</p>
+    <p class="text-center text-white/25 text-xs">FindOut &middot; AI Placement Platform</p>
   </footer>
   <script>
     document.getElementById('skillsInput').addEventListener('input',function(){
@@ -111,7 +111,7 @@
     <div class="flex items-center justify-between px-5 py-4 border-b" style="background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.2));border-color:rgba(255,255,255,.1);border-radius:1.5rem 1.5rem 0 0">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">💬</div>
-        <div><p class="text-white font-bold text-sm">PlacementIQ Assistant</p><p class="text-white/40 text-xs">Ask me anything</p></div>
+        <div><p class="text-white font-bold text-sm">FindOut Assistant</p><p class="text-white/40 text-xs">Ask me anything</p></div>
       </div>
       <button id="closeChat" class="text-white/60 hover:text-white text-xl leading-none transition-colors">&times;</button>
     </div>
@@ -143,7 +143,7 @@
     if(!chatWindow.classList.contains('hidden')){
       chatInput.focus();
       if(chatMessages.children.length===0){
-        addBotMessage("Hi! I'm your PlacementIQ assistant. Ask me anything about the platform, authenticity scores, GitHub integration, or job matching!");
+        addBotMessage("Hi! I'm your FindOut assistant. Ask me anything about the platform, authenticity scores, GitHub integration, or job matching!");
       }
     }
   }

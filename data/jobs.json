@@ -53,5 +53,18 @@
     ],
     "created_by": "jay",
     "created_at": "2026-02-27T09:42:24.988017+00:00"
+  },
+  {
+    "id": "d165139a-63ea-4ed1-bb1f-c1c468378f27",
+    "title": "AI Engineer",
+    "company": "RTH",
+    "description": "Ai ml",
+    "required_skills": [
+      "python",
+      "machine learning",
+      "deep learning"
+    ],
+    "created_by": "Rudra",
+    "created_at": "2026-02-28T13:57:36.801740+00:00"
   }
 ]

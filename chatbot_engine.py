@@ -1,5 +1,5 @@
-"""
-chatbot_engine.py  –  PlacementIQ Intelligent Chatbot
+﻿"""
+chatbot_engine.py  –  FindOut Intelligent Chatbot
 =====================================================
 Handles a wide variety of natural-language questions about the platform.
 
@@ -25,7 +25,7 @@ KNOWLEDGE_BASE = [
                     "sup bot", "greetings"],
         "keywords": ["hello", "hi", "hey", "howdy", "morning", "afternoon", "evening"],
         "response": (
-            "Hey! 👋 I'm your PlacementIQ assistant — always online and happy to help.\n\n"
+            "Hey! 👋 I'm your FindOut assistant — always online and happy to help.\n\n"
             "Here's what I can answer:\n"
             "📊 Readiness & Authenticity scores\n"
             "🐙 GitHub & LeetCode integration\n"
@@ -37,17 +37,17 @@ KNOWLEDGE_BASE = [
         )
     },
 
-    # ── What is PlacementIQ ──────────────────────────────────────────────────
+    # ── What is FindOut ──────────────────────────────────────────────────
     {
-        "phrases": ["what is placementiq", "what does placementiq do", "about placementiq",
-                    "explain placementiq", "tell me about placementiq",
+        "phrases": ["what is FindOut", "what does FindOut do", "about FindOut",
+                    "explain FindOut", "tell me about FindOut",
                     "what is this platform", "what is this website", "what is this app",
                     "purpose of this platform", "tell me about this platform",
                     "tell me about placement", "what is placement platform",
-                    "describe this platform", "overview of placementiq"],
-        "keywords": ["placementiq", "platform", "overview", "purpose", "goal"],
+                    "describe this platform", "overview of FindOut"],
+        "keywords": ["FindOut", "platform", "overview", "purpose", "goal"],
         "response": (
-            "PlacementIQ is an AI-powered campus placement platform that goes far beyond a regular job board.\n\n"
+            "FindOut is an AI-powered campus placement platform that goes far beyond a regular job board.\n\n"
             "Here's what makes it unique:\n"
             "🔍 Analyzes your Resume, GitHub & LeetCode profiles together\n"
             "✅ Verifies your skills with real code evidence (not just what you wrote on paper)\n"
@@ -132,7 +132,7 @@ KNOWLEDGE_BASE = [
                     "what does score mean", "explain the scoring"],
         "keywords": ["scores", "scoring", "rating", "metrics", "evaluation"],
         "response": (
-            "PlacementIQ gives you 3 powerful scores:\n\n"
+            "FindOut gives you 3 powerful scores:\n\n"
             "🔵 Readiness Score (0–100)\n"
             "Your overall job-readiness. Combines authentication, role match, coding activity & CGPA.\n\n"
             "🟣 Authenticity Score (0–100)\n"
@@ -242,7 +242,7 @@ KNOWLEDGE_BASE = [
                     "how to send application", "can i apply multiple jobs"],
         "keywords": ["apply", "application", "applying", "submit", "send-application"],
         "response": (
-            "Applying for jobs on PlacementIQ is simple and smart: 💼\n\n"
+            "Applying for jobs on FindOut is simple and smart: 💼\n\n"
             "1. Go to the **Jobs** page after analysing your profile\n"
             "2. You'll see all active listings with YOUR personal match % on each card\n"
             "3. Jobs where you match 70%+ are highlighted as strong fits\n"
@@ -281,11 +281,11 @@ KNOWLEDGE_BASE = [
     {
         "phrases": ["recruiter features", "i am a recruiter", "for recruiters",
                     "how does it work for recruiters", "recruiter dashboard",
-                    "how to find candidates", "how to hire using placementiq",
+                    "how to find candidates", "how to hire using FindOut",
                     "recruiter login", "view applicants", "rank applicants"],
         "keywords": ["recruiter", "recruiter", "employer", "hiring-manager", "hr", "candidates", "shortlist"],
         "response": (
-            "PlacementIQ is a game-changer for recruiters! 👔\n\n"
+            "FindOut is a game-changer for recruiters! 👔\n\n"
             "Here's your full feature set:\n"
             "📝 Post Jobs — add title, description, and required skills\n"
             "🤖 Auto-ranking — applicants are instantly ranked by AI the moment they apply\n"
@@ -326,7 +326,7 @@ KNOWLEDGE_BASE = [
                     "free to use", "any fees", "is it paid", "free platform"],
         "keywords": ["free", "cost", "price", "pricing", "pay", "payment", "charge", "money", "subscription", "fees"],
         "response": (
-            "PlacementIQ is 100% FREE — for both students AND recruiters! 🎉\n\n"
+            "FindOut is 100% FREE — for both students AND recruiters! 🎉\n\n"
             "✅ No sign-up fees\n"
             "✅ No subscription plans\n"
             "✅ No premium tiers — all features are available to everyone\n"
@@ -352,7 +352,7 @@ KNOWLEDGE_BASE = [
             "👁️ Profile visibility — recruiters can only see your profile when you actively apply to their job.\n"
             "🚫 We do NOT sell your data to anyone. Ever.\n"
             "🔐 All communication is encrypted (HTTPS).\n\n"
-            "If you have specific privacy concerns, email us at privacy@placementiq.com "
+            "If you have specific privacy concerns, email us at privacy@FindOut.com "
             "and we'll address them directly."
         )
     },
@@ -395,7 +395,7 @@ KNOWLEDGE_BASE = [
             "Real example:\n"
             "❌ Student A: CGPA 9.5, no GitHub, 10 LeetCode problems → Readiness: 42\n"
             "✅ Student B: CGPA 7.2, 12 GitHub projects, 180 LeetCode problems → Readiness: 81\n\n"
-            "Student B wins every time. PlacementIQ is built for skill-first hiring. "
+            "Student B wins every time. FindOut is built for skill-first hiring. "
             "If you have low grades, invest that energy into GitHub projects and LeetCode — "
             "your score will reflect it! 💪"
         )
@@ -410,7 +410,7 @@ KNOWLEDGE_BASE = [
                     "haven t github", "haven t leetcode"],
         "keywords": ["without-github", "no-github", "no-leetcode", "don-have"],
         "response": (
-            "You can absolutely still use PlacementIQ without GitHub or LeetCode! 🙌\n\n"
+            "You can absolutely still use FindOut without GitHub or LeetCode! 🙌\n\n"
             "Here's what happens:\n"
             "📄 Without GitHub → Your Authenticity Score will be lower "
             "since we can't verify skills through real projects. Skills will show as 'Claimed' not 'Verified'.\n"
@@ -434,7 +434,7 @@ KNOWLEDGE_BASE = [
             "💡 Browse job listings first — see which roles naturally have your skills listed\n"
             "🎯 Pick a role where your current match % is highest as your primary target\n"
             "📊 You can also re-analyse with different roles to compare match scores\n\n"
-            "Common roles on PlacementIQ:\n"
+            "Common roles on FindOut:\n"
             "👨‍💻 Software Engineer, Frontend Developer, Backend Engineer, Full Stack Developer\n"
             "📊 Data Analyst, Data Scientist, ML Engineer\n"
             "☁️ DevOps Engineer, Cloud Engineer, SRE\n"
@@ -568,7 +568,7 @@ KNOWLEDGE_BASE = [
             "📄 Ensure your resume is under 5 MB and in PDF/DOCX format\n"
             "🔒 Make sure your GitHub profile is public (private profiles can't be scanned)\n\n"
             "Still having trouble?\n"
-            "📧 Email us at support@placementiq.com with:\n"
+            "📧 Email us at support@FindOut.com with:\n"
             "• What you were trying to do\n"
             "• What error message you saw\n"
             "• Your GitHub/LeetCode username (if relevant)\n\n"
@@ -584,9 +584,9 @@ KNOWLEDGE_BASE = [
         "keywords": ["contact", "support", "email", "feedback", "suggest", "team", "helpdesk"],
         "response": (
             "Need to reach us? Here's how: 📬\n\n"
-            "📧 General enquiries: hello@placementiq.com\n"
-            "🐛 Bug reports: support@placementiq.com\n"
-            "💡 Feature suggestions: feedback@placementiq.com\n\n"
+            "📧 General enquiries: hello@FindOut.com\n"
+            "🐛 Bug reports: support@FindOut.com\n"
+            "💡 Feature suggestions: feedback@FindOut.com\n\n"
             "We're a small but passionate team committed to improving campus hiring. "
             "We read every piece of feedback and typically respond within 24 hours on weekdays.\n\n"
             "Or just keep chatting with me — I can probably answer your question right here! 😊"
@@ -596,18 +596,18 @@ KNOWLEDGE_BASE = [
     # ── Difference from LinkedIn, Naukri, etc. ────────────────────────────────
     {
         "phrases": ["how is this different from linkedin", "compare with naukri",
-                    "different from other platforms", "why use placementiq",
+                    "different from other platforms", "why use FindOut",
                     "why not just use linkedin", "vs linkedin", "vs naukri",
                     "what makes this unique", "why is this better"],
         "keywords": ["linkedin", "naukri", "different", "compare", "unique", "better", "vs"],
         "response": (
-            "Great question! Here's how PlacementIQ stands apart from LinkedIn, Naukri, etc.: 🆚\n\n"
+            "Great question! Here's how FindOut stands apart from LinkedIn, Naukri, etc.: 🆚\n\n"
             "Traditional platforms:\n"
             "❌ You write whatever skills you want — no verification\n"
             "❌ Recruiters can't tell if you actually know what you claim\n"
             "❌ Based on connections & endorsements, not real evidence\n"
             "❌ No coding activity signal\n\n"
-            "PlacementIQ:\n"
+            "FindOut:\n"
             "✅ Skills VERIFIED through GitHub code analysis\n"
             "✅ Coding proficiency measured via LeetCode\n"
             "✅ AI-generated scores replace guesswork\n"
@@ -621,11 +621,11 @@ KNOWLEDGE_BASE = [
     # ── Student benefits ──────────────────────────────────────────────────────
     {
         "phrases": ["benefits for students", "why should i use this", "how does this help me",
-                    "what do i gain", "is it useful", "should i use placementiq",
+                    "what do i gain", "is it useful", "should i use FindOut",
                     "advantages of using"],
         "keywords": ["benefit", "benefits", "advantage", "useful", "gain", "help", "value"],
         "response": (
-            "Here's exactly how PlacementIQ benefits YOU as a student: 🎓\n\n"
+            "Here's exactly how FindOut benefits YOU as a student: 🎓\n\n"
             "📊 Know where you stand — see your actual job-readiness score before applying\n"
             "🔍 Identify blind spots — discover skill gaps you didn't know you had\n"
             "🗺️ Get a clear plan — personalised roadmap tells you exactly what to learn next\n"
@@ -634,7 +634,7 @@ KNOWLEDGE_BASE = [
             "⏰ Save time — no more applying to 100 jobs hoping one sticks\n"
             "💰 It's FREE — no cost, ever\n\n"
             "Think of it as a career coach + portfolio analyser + job board — all in one. "
-            "Students who use PlacementIQ land interviews 3× faster than those who just send CVs. 💪"
+            "Students who use FindOut land interviews 3× faster than those who just send CVs. 💪"
         )
     },
 
@@ -705,7 +705,7 @@ def get_bot_response(user_message: str) -> str:
     try:
         if not user_message or not user_message.strip():
             return (
-                "Hi! I'm your PlacementIQ assistant. Ask me anything about "
+                "Hi! I'm your FindOut assistant. Ask me anything about "
                 "scores, GitHub integration, jobs, roadmaps, or recruiter features!"
             )
 
@@ -748,6 +748,6 @@ def get_bot_response(user_message: str) -> str:
 
     except Exception:
         return (
-            "I'm here to help! Ask me about PlacementIQ scores, "
+            "I'm here to help! Ask me about FindOut scores, "
             "GitHub integration, job matching, or roadmaps. 😊"
         )

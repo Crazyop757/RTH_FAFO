@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PlacementIQ &ndash; AI-Driven Placement Intelligence</title>
+  <title>FindOut &ndash; AI-Driven Placement Intelligence</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
@@ -46,7 +46,7 @@
 <body class="mesh text-white antialiased overflow-x-hidden min-h-screen flex flex-col">
   <nav class="glass sticky top-0 z-50">
     <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/home" class="flex items-center gap-3"><div class="w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm text-white" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.55)">P</div><span class="font-bold text-white tracking-tight text-lg">PlacementIQ</span></a>
+      <a href="/home" class="flex items-center select-none"><span class="text-white font-extralight text-xl tracking-[0.2em] uppercase">Find</span><span class="text-white font-black text-xl tracking-tight uppercase">Out</span></a>
       <div class="hidden sm:flex items-center gap-8"><a href="#features" class="nav-link text-sm">Features</a><a href="#how" class="nav-link text-sm">How it works</a></div>
       <a href="/login" class="btn-g text-white px-5 py-2.5 rounded-xl text-sm font-semibold">Sign In &rarr;</a>
     </div>
@@ -121,12 +121,12 @@
     <div class="max-w-3xl mx-auto rounded-3xl p-12 text-center relative overflow-hidden" style="background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.18));border:1px solid rgba(99,102,241,.35)">
       <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,.35),transparent 65%)"></div>
       <h2 class="text-3xl sm:text-4xl font-black text-white mb-4 relative z-10">Ready to stand out?</h2>
-      <p class="text-white/45 text-sm mb-8 relative z-10">Join students and recruiters already using PlacementIQ to accelerate hiring.</p>
+      <p class="text-white/45 text-sm mb-8 relative z-10">Join students and recruiters already using FindOut to accelerate hiring.</p>
       <a href="/login" class="btn-g inline-block text-white px-10 py-4 rounded-2xl font-bold text-base relative z-10">Get Started Free &rarr;</a>
     </div>
   </section>
   <footer class="border-t mt-auto py-8 px-6" style="border-color:rgba(255,255,255,.06)">
-    <p class="text-center text-white/25 text-xs">PlacementIQ &middot; AI Placement Platform</p>
+    <p class="text-center text-white/25 text-xs">FindOut &middot; AI Placement Platform</p>
   </footer>
 
   <!-- Chatbot Widget -->
@@ -136,7 +136,7 @@
     <div class="flex items-center justify-between px-5 py-4 border-b" style="background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.2));border-color:rgba(255,255,255,.1);border-radius:1.5rem 1.5rem 0 0">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">💬</div>
-        <div><p class="text-white font-bold text-sm">PlacementIQ Assistant</p><p class="text-white/40 text-xs">Ask me anything</p></div>
+        <div><p class="text-white font-bold text-sm">FindOut Assistant</p><p class="text-white/40 text-xs">Ask me anything</p></div>
       </div>
       <button id="closeChat" class="text-white/60 hover:text-white text-xl leading-none transition-colors">&times;</button>
     </div>
@@ -168,7 +168,7 @@
     if(!chatWindow.classList.contains('hidden')){
       chatInput.focus();
       if(chatMessages.children.length===0){
-        addBotMessage("Hi! I'm your PlacementIQ assistant. Ask me anything about the platform, authenticity scores, GitHub integration, or job matching!");
+        addBotMessage("Hi! I'm your FindOut assistant. Ask me anything about the platform, authenticity scores, GitHub integration, or job matching!");
       }
     }
   }

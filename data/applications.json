@@ -44,5 +44,51 @@
     "authenticity": 0.08,
     "readiness": 43.99,
     "role_match": 0.5263
+  },
+  {
+    "id": "57c9f354-809f-4538-ba95-3cba2bc40736",
+    "job_id": "d165139a-63ea-4ed1-bb1f-c1c468378f27",
+    "student_id": "Rudra1",
+    "applied_at": "2026-02-28T13:58:25.630928+00:00",
+    "resume_skills": [
+      "c",
+      "c++",
+      "computer vision",
+      "deep learning",
+      "fastapi",
+      "flask",
+      "generative ai",
+      "git",
+      "github",
+      "google colab",
+      "javascript",
+      "keras",
+      "langchain",
+      "llm",
+      "neural networks",
+      "nlp",
+      "numpy",
+      "opencv",
+      "python",
+      "pytorch",
+      "rag",
+      "regression",
+      "scikit-learn",
+      "stack",
+      "tensorflow"
+    ],
+    "github_skills": [
+      "css",
+      "html",
+      "javascript",
+      "jupyter",
+      "machine learning",
+      "python",
+      "typescript"
+    ],
+    "leetcode_total": 35,
+    "authenticity": 0.08,
+    "readiness": 43.74,
+    "role_match": 0.5263
   }
 ]
